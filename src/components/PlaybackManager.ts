@@ -5,7 +5,6 @@ import { MediaItem } from '../api/jellyfin'
 import { useAudioStorageContext } from '../context/AudioStorageContext/AudioStorageContext'
 import { useJellyfinContext } from '../context/JellyfinContext/JellyfinContext'
 import { IJellyfinInfiniteProps, useJellyfinInfiniteData } from '../hooks/Jellyfin/Infinite/useJellyfinInfiniteData'
-import { LyricDto } from '@jellyfin/sdk/lib/generated-client'
 
 export type IReviver = {
     queryKey: unknown[]
@@ -121,7 +120,7 @@ export const usePlaybackManager = ({ initialVolume, clearOnLogout }: PlaybackMan
         )
     }, [currentShuffledIndex.index, currentTrackIndex.index, items, shuffle])
 
-    const { data: currentTrackLyrics, isLoading: currentTrackLyricsLoading } = useQuery<LyricDto | null>({
+    const { data: currentTrackLyrics, isLoading: currentTrackLyricsLoading } = useQuery({
         queryKey: useMemo(() => [`lyrics-${currentTrack?.Id || null}`], [currentTrack]),
         queryFn: async () => {
             const id = currentTrack?.Id

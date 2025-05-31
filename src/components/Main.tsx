@@ -329,8 +329,8 @@ const LyricsDisplay = () => {
             nextLineTimeout.current = null
         }
     }
+
     useEffect(() => {
-        clearNextLineTimeout()
         const millis = timeDiff(nextLineStart, currentTime)
         if (millis > 0) {
             // Sets timeout to diff from next line and last currentTime update
@@ -339,6 +339,8 @@ const LyricsDisplay = () => {
                 clearNextLineTimeout()
             }, millis)
         }
+
+        return clearNextLineTimeout
     }, [playback.isPlaying, currentTime, currentLineIndex, nextLineStart])
 
     useEffect(() => {
@@ -407,8 +409,10 @@ const LyricsDisplay = () => {
     return (
         <div className="scroll-container" ref={lyricsContainer}>
             <div className={'lyrics-display' + (lyrics ? ' active' : '')}>
-                {(lyrics && displayedLines) || (playback.currentTrackLyricsLoading && <div>Loading...</div>) || (
-                    <div style={{ textAlign: 'center' }}>No Lyrics</div>
+                {(lyrics && displayedLines) || (
+                    <div style={{ textAlign: 'center' }}>
+                        {playback.currentTrackLyricsLoading ? 'Loading...' : 'No Lyrics'}
+                    </div>
                 )}
             </div>
         </div>
