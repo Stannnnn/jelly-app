@@ -715,7 +715,7 @@ body.lockscroll {
     display: block;
     transition: 0.5s;
 
-    overflow: scroll;
+    overflow-y: scroll;
 
     max-height: 40vh;
     height: var(--lyrics-collapsed-height);
