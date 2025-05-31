@@ -25,7 +25,7 @@ export const useJellyfinInfiniteData = ({
     >({
         queryKey,
         queryFn,
-        getNextPageParam: (lastPage, pages) => (lastPage.length === itemsPerPage ? pages.length : undefined),
+        getNextPageParam: (lastPage, pages) => (lastPage.length >= itemsPerPage ? pages.length : undefined),
         initialPageParam,
         staleTime: Infinity,
     })

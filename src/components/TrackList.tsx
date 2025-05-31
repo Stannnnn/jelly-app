@@ -5,7 +5,7 @@ import { IMenuItems } from '../context/DropdownContext/DropdownContextProvider'
 import { usePlaybackContext } from '../context/PlaybackContext/PlaybackContext'
 import { formatDuration } from '../utils/formatDuration'
 import { IReviver } from './PlaybackManager'
-import { PlaystateAnimationTracklist } from './SvgIcons'
+import { DeletingIcon, DownloadedIcon, DownloadingIcon, PlaystateAnimationTracklist } from './SvgIcons'
 import './TrackList.css'
 
 export const TrackList = ({
@@ -102,11 +102,35 @@ export const TrackList = ({
                                     </div>
                                 )}
                             </div>
-                            {track.UserData?.IsFavorite && (
-                                <div className="favorited" title="Favorited">
-                                    <HeartFillIcon size={12} />
-                                </div>
-                            )}
+                            <div className="track-indicators">
+                                {track.offlineState && (
+                                    <div className="download-state">
+                                        {track.offlineState === 'downloading' && (
+                                            <div className="icon downloading" title="Downloading">
+                                                <DownloadingIcon width={12} height={12} />
+                                            </div>
+                                        )}
+
+                                        {track.offlineState === 'downloaded' && (
+                                            <div className="icon downloaded" title="Downloaded">
+                                                <DownloadedIcon width={12} height={12} />
+                                            </div>
+                                        )}
+
+                                        {track.offlineState === 'deleting' && (
+                                            <div className="icon deleting" title="Deleting">
+                                                <DeletingIcon width={12} height={12} />
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+
+                                {track.UserData?.IsFavorite && (
+                                    <div className="favorited" title="Favorited">
+                                        <HeartFillIcon size={12} />
+                                    </div>
+                                )}
+                            </div>
                             <div className="duration">{formatDuration(track.RunTimeTicks)}</div>
                         </div>
                     </li>

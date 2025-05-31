@@ -1,7 +1,7 @@
 .dropdown,
 .sub-dropdown {
     position: absolute;
-    z-index: 2;
+    z-index: 3;
 }
 
 .dropdown {
@@ -179,7 +179,6 @@
         left: 16px !important;
         bottom: 16px !important;
         width: calc(100% - 32px);
-        z-index: 3;
         opacity: 1;
         visibility: visible;
         transform: scale(1) translateY(calc(100% + 16px));
@@ -196,6 +195,7 @@
         border-radius: 12px;
         padding: 7px;
         gap: 4px;
+        border: none;
         box-shadow: none;
         background-color: var(--bg-color-secondary);
         max-height: 60dvh;
@@ -212,9 +212,17 @@
 
     .dropdown > .dropdown-menu > .dropdown-item {
         font-size: 0.825rem;
-        padding: 7px 12px;
+        padding: 8px 12px;
         border-radius: 6px;
         transition: opacity 0.2s ease-out;
+    }
+
+    .dropdown > .dropdown-menu > .dropdown-item:hover {
+        background-color: unset;
+    }
+
+    .dropdown > .dropdown-menu > .dropdown-item:active {
+        background-color: var(--bg-color-tertiary);
     }
 
     .dropdown > .dropdown-menu > .dropdown-item.return-item {
@@ -258,7 +266,7 @@
         font: inherit;
         position: relative;
         flex: 1;
-        padding: 7px 12px;
+        padding: 8px 12px;
         background: transparent;
     }
 

@@ -278,3 +278,24 @@
 .settings-page > .section > .actions > .logout-button:hover {
     background-color: var(--btn-brand-color-hover);
 }
+
+/* Downloads Management */
+.settings-page > .section.downloads-management > .desc > .actions {
+    margin-top: 14px;
+}
+
+.settings-page > .section.downloads-management > .desc > .actions > .downloads-link {
+    font-size: 0.725rem;
+    font-weight: 500;
+    color: var(--font-color-inverted);
+    background-color: var(--btn-brand-color);
+    padding: 7px 13px;
+    border-radius: 6px;
+    text-decoration: none;
+    display: inline-block;
+    transition: background-color 0.2s ease-out;
+}
+
+.settings-page > .section.downloads-management > .desc > .actions > .downloads-link:hover {
+    background-color: var(--btn-brand-color-hover);
+}

@@ -18,8 +18,18 @@ import './Artist.css'
 export const Artist = () => {
     const playback = usePlaybackContext()
     const { artistId } = useParams<{ artistId: string }>()
-    const { artist, tracks, albums, appearsInAlbums, totalTrackCount, totalPlaytime, totalPlays, loading, error } =
-        useJellyfinArtistData(artistId!)
+    const {
+        artist,
+        tracks,
+        albums,
+        appearsInAlbums,
+        totalTrackCount,
+        totalPlaytime,
+        totalPlays,
+        totalAlbumCount,
+        loading,
+        error,
+    } = useJellyfinArtistData(artistId!)
     const {
         playlists,
         loading: playlistsLoading,
@@ -79,8 +89,8 @@ export const Artist = () => {
                         </div>
                         <div className="divider"></div>
                         <div className="album-amount">
-                            <span className="number">{albums.length}</span>{' '}
-                            <span>{albums.length === 1 ? 'Album' : 'Albums'}</span>
+                            <span className="number">{totalAlbumCount}</span>{' '}
+                            <span>{totalAlbumCount === 1 ? 'Album' : 'Albums'}</span>
                         </div>
                         <div className="divider"></div>
                         <div className="length">

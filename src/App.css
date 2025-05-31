@@ -101,6 +101,11 @@ input::placeholder {
     color: var(--font-color-tertiary);
 }
 
+/* Prevent page zoom for iOS devices */
+html.iOS input {
+    font-size: 1rem !important;
+}
+
 /*
 button:disabled {
     opacity: 0.3;
@@ -507,6 +512,7 @@ body.lockscroll {
 }
 
 .filter > select > option {
+    font-weight: 500;
     color: var(--font-color);
 }
 

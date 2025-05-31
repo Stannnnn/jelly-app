@@ -10,10 +10,13 @@ export const AuthForm = ({
     const isDemo = queryParams.get('demo') === '1'
 
     // If the URL is locked, we just use the default
-    const lockedURL = import.meta.env.VITE_LOCK_JELLYFIN_URL === 'true';
+    const lockedURL = import.meta.env.VITE_LOCK_JELLYFIN_URL === 'true'
     let loadedURL = import.meta.env.VITE_DEFAULT_JELLYFIN_URL
+
     if (!lockedURL) {
-        loadedURL = isDemo ? 'https://demo.jellyfin.org/stable' : localStorage.getItem('lastServerUrl') || import.meta.env.VITE_DEFAULT_JELLYFIN_URL || ''
+        loadedURL = isDemo
+            ? 'https://demo.jellyfin.org/stable'
+            : localStorage.getItem('lastServerUrl') || import.meta.env.VITE_DEFAULT_JELLYFIN_URL || ''
     }
 
     const [serverUrl, setServerUrl] = useState(loadedURL)
@@ -94,7 +97,7 @@ export const AuthForm = ({
         <form className="login_form" onSubmit={handleSubmit}>
             <div className="error_placeholder">{error && <div className="error">{error}</div>}</div>
             <div className="title">Welcome back</div>
-            {!lockedURL && // We do not render if the URL is locked
+            {!lockedURL && ( // We do not render if the URL is locked
                 <div className="input_container">
                     <input
                         type="text"
@@ -104,7 +107,7 @@ export const AuthForm = ({
                         disabled={loading}
                     />
                 </div>
-            }
+            )}
             <div className="input_container">
                 <input
                     type="text"

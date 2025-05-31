@@ -10,7 +10,7 @@ import { JellyImg } from './JellyImg'
 import { Loader } from './Loader'
 import { IReviver } from './PlaybackManager'
 import { Skeleton } from './Skeleton'
-import { PlaystateAnimationMedalist } from './SvgIcons'
+import { DeletingIcon, DownloadedIcon, DownloadingIcon, PlaystateAnimationMedalist } from './SvgIcons'
 
 export const MediaList = ({
     items = [],
@@ -100,11 +100,34 @@ export const MediaList = ({
                             <div className="artist">{item.AlbumArtist || 'Unknown Artist'}</div>
                         </div>
                     </div>
-                    {item.UserData?.IsFavorite && location.pathname !== '/favorites' && (
-                        <div className="favorited" title="Favorited">
-                            <HeartFillIcon size={16} />
-                        </div>
-                    )}
+                    <div className="media-indicators">
+                        {item.offlineState && (
+                            <div className="download-state">
+                                {item.offlineState === 'downloading' && (
+                                    <div className="icon downloading" title="Downloading">
+                                        <DownloadingIcon width={16} height={16} />
+                                    </div>
+                                )}
+
+                                {item.offlineState === 'downloaded' && (
+                                    <div className="icon downloaded" title="Downloaded">
+                                        <DownloadedIcon width={16} height={16} />
+                                    </div>
+                                )}
+
+                                {item.offlineState === 'deleting' && (
+                                    <div className="icon deleting" title="Deleting">
+                                        <DeletingIcon width={16} height={16} />
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                        {item.UserData?.IsFavorite && location.pathname !== '/favorites' && (
+                            <div className="favorited" title="Favorited">
+                                <HeartFillIcon size={16} />
+                            </div>
+                        )}
+                    </div>
                 </div>
             )
         } else if (type === 'artist') {
@@ -125,11 +148,34 @@ export const MediaList = ({
                     <div className="media-details">
                         <div className="song-name">{item.Name || 'Unknown Artist'}</div>
                     </div>
-                    {item.UserData?.IsFavorite && location.pathname !== '/favorites' && (
-                        <div className="favorited" title="Favorited">
-                            <HeartFillIcon size={16} />
-                        </div>
-                    )}
+                    <div className="media-indicators">
+                        {item.offlineState && (
+                            <div className="download-state">
+                                {item.offlineState === 'downloading' && (
+                                    <div className="icon downloading" title="Downloading">
+                                        <DownloadingIcon width={16} height={16} />
+                                    </div>
+                                )}
+
+                                {item.offlineState === 'downloaded' && (
+                                    <div className="icon downloaded" title="Downloaded">
+                                        <DownloadedIcon width={16} height={16} />
+                                    </div>
+                                )}
+
+                                {item.offlineState === 'deleting' && (
+                                    <div className="icon deleting" title="Deleting">
+                                        <DeletingIcon width={16} height={16} />
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                        {item.UserData?.IsFavorite && location.pathname !== '/favorites' && (
+                            <div className="favorited" title="Favorited">
+                                <HeartFillIcon size={16} />
+                            </div>
+                        )}
+                    </div>
                 </div>
             )
         } else {
@@ -173,11 +219,34 @@ export const MediaList = ({
                             </>
                         </div>
                     </div>
-                    {item.UserData?.IsFavorite && location.pathname !== '/favorites' && (
-                        <div className="favorited" title="Favorited">
-                            <HeartFillIcon size={16} />
-                        </div>
-                    )}
+                    <div className="media-indicators">
+                        {item.offlineState && (
+                            <div className="download-state">
+                                {item.offlineState === 'downloading' && (
+                                    <div className="icon downloading" title="Downloading">
+                                        <DownloadingIcon width={16} height={16} />
+                                    </div>
+                                )}
+
+                                {item.offlineState === 'downloaded' && (
+                                    <div className="icon downloaded" title="Downloaded">
+                                        <DownloadedIcon width={16} height={16} />
+                                    </div>
+                                )}
+
+                                {item.offlineState === 'deleting' && (
+                                    <div className="icon deleting" title="Deleting">
+                                        <DeletingIcon width={16} height={16} />
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                        {item.UserData?.IsFavorite && location.pathname !== '/favorites' && (
+                            <div className="favorited" title="Favorited">
+                                <HeartFillIcon size={16} />
+                            </div>
+                        )}
+                    </div>
                 </li>
             )
         }

@@ -1,6 +1,6 @@
 import { CheckCircleFillIcon } from '@primer/octicons-react'
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useJellyfinContext } from '../context/JellyfinContext/JellyfinContext'
 import { usePlaybackContext } from '../context/PlaybackContext/PlaybackContext'
 import { useThemeContext } from '../context/ThemeContext/ThemeContext'
@@ -292,6 +292,18 @@ export const Settings = ({ onLogout }: { onLogout: () => void }) => {
                     </div>
                 </div>
                 */}
+            </div>
+            <div className="section downloads-management">
+                <div className="title">Downloads</div>
+                <div className="desc">
+                    <p className="subtitle">Offline Music Management</p>
+                    <p>Manage your downloaded music and monitor storage usage</p>
+                    <div className="actions">
+                        <Link to="/downloads" className="downloads-link">
+                            Manage Downloads
+                        </Link>
+                    </div>
+                </div>
             </div>
             <div className="section about">
                 <div className="title">About</div>

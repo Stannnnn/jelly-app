@@ -13,22 +13,22 @@ const isObject = (data: unknown): data is { [x: string]: unknown } => {
     return typeof data === 'object'
 }
 
-const patchData = (data: unknown, itemId: string, patch: IPatch): unknown => {
+const patchData = (data: unknown, itemIds: string[], patch: IPatch): unknown => {
     if (!data) return data
 
     if (Array.isArray(data)) {
-        return data.map(item => patchData(item, itemId, patch))
+        return data.map(item => patchData(item, itemIds, patch))
     }
 
     if (isObject(data)) {
-        if (isMediaItem(data) && data.Id === itemId) {
+        if (isMediaItem(data) && itemIds.includes(data.Id)) {
             return patch(data)
         }
 
         if (isPages(data)) {
             return {
                 ...data,
-                pages: data.pages.map(page => patchData(page, itemId, patch)),
+                pages: data.pages.map(page => patchData(page, itemIds, patch)),
             }
         }
 
@@ -36,7 +36,7 @@ const patchData = (data: unknown, itemId: string, patch: IPatch): unknown => {
         const newData: { [x: string]: unknown } = {}
 
         for (const key in data) {
-            newData[key] = patchData(data[key], itemId, patch)
+            newData[key] = patchData(data[key], itemIds, patch)
         }
 
         return newData
@@ -50,19 +50,24 @@ type IPatch = (item: MediaItem) => MediaItem
 export const usePatchQueries = () => {
     const queryClient = useQueryClient()
 
+    const patchMediaItems = (mediaItemIds: string[], patch: IPatch) => {
+        const allQueries = queryClient.getQueryCache().findAll()
+
+        for (const query of allQueries) {
+            const data = query.state.data
+
+            if (!data) continue
+
+            queryClient.setQueryData(query.queryKey, patchData(data, mediaItemIds, patch))
+        }
+    }
+
     return {
         patchMediaItem: (mediaItemId: string, patch: IPatch) => {
-            const allQueries = queryClient.getQueryCache().findAll()
-
-            for (const query of allQueries) {
-                const data = query.state.data
-
-                if (!data) continue
-
-                queryClient.setQueryData(query.queryKey, patchData(data, mediaItemId, patch))
-            }
+            return patchMediaItems([mediaItemId], patch)
         },
-        prependItemToQueryData: (queryKey: string[], item: MediaItem) => {
+        patchMediaItems,
+        prependItemsToQueryData: (queryKey: string[], items: MediaItem[]) => {
             const allQueries = queryClient.getQueryCache().findAll()
 
             for (const query of allQueries) {
@@ -78,10 +83,10 @@ export const usePatchQueries = () => {
 
                     query.setData({
                         ...data,
-                        pages: [[item, ...first], ...pages],
+                        pages: [[...items, ...first], ...pages],
                     })
                 } else {
-                    query.setData([item, ...(data as MediaItem[])])
+                    query.setData([...items, ...(data as MediaItem[])])
                 }
             }
         },

@@ -2,60 +2,56 @@ import { useQuery } from '@tanstack/react-query'
 import { MediaItem } from '../../api/jellyfin'
 import { useJellyfinContext } from '../../context/JellyfinContext/JellyfinContext'
 
-interface JellyfinArtistData {
-    artist: MediaItem | null
-    tracks: MediaItem[]
-    albums: MediaItem[]
-    appearsInAlbums: MediaItem[]
-    totalTrackCount: number
-    totalPlaytime: number
-    totalPlays: number
-    loading: boolean
-    error: string | null
-}
-
 export const useJellyfinArtistData = (artistId: string, trackLimit = 5) => {
     const api = useJellyfinContext()
 
-    const { data, isFetching, isPending, error } = useQuery<JellyfinArtistData, Error>({
-        queryKey: ['artistData', artistId, trackLimit],
+    // Fetch artist details and top tracks
+    const {
+        data: artistData,
+        isFetching: artistFetching,
+        isPending: artistPending,
+        error: artistError,
+    } = useQuery<{ artist: MediaItem; tracks: MediaItem[] }, Error>({
+        queryKey: ['artistDetails', artistId, trackLimit],
+        queryFn: () => api.getArtistDetails(artistId, trackLimit),
+    })
+
+    // Fetch stats
+    const { data: statsData, error: statsError } = useQuery<
+        {
+            albums: MediaItem[]
+            appearsInAlbums: MediaItem[]
+            totalTrackCount: number
+            totalPlaytime: number
+            totalAlbumCount: number
+            totalPlays: number
+        },
+        Error
+    >({
+        queryKey: ['artistStats', artistId],
         queryFn: async () => {
-            const [artistDetailsResponse, allTracks] = await Promise.all([
-                api.getArtistDetails(artistId, trackLimit),
-                api.fetchAllTracks(artistId),
-            ])
-
-            const { artist, tracks, albums, appearsInAlbums, totalTrackCount } = artistDetailsResponse
-
-            const totalPlaytime = allTracks.reduce(
-                (sum: number, track: MediaItem) => sum + (track.RunTimeTicks || 0),
-                0
-            )
+            const stats = await api.getArtistStats(artistId, artistData?.artist.Name || '')
+            const allTracks = await api.fetchAllTracks(artistId)
             const totalPlays = allTracks.reduce(
                 (sum: number, track: MediaItem) => sum + (track.UserData?.PlayCount || 0),
                 0
             )
-            return {
-                artist,
-                tracks,
-                albums,
-                appearsInAlbums,
-                totalTrackCount,
-                totalPlaytime,
-                totalPlays,
-                loading: false,
-                error: null,
-            }
+            const totalAlbumCount = stats.albums.length
+            return { ...stats, totalPlays, totalAlbumCount }
         },
+        enabled: !!artistData?.artist,
     })
 
     return {
-        ...data,
-        loading: isFetching || isPending,
-        error: error ? error.message : null,
-        appearsInAlbums: data?.appearsInAlbums || [],
-        albums: data?.albums || [],
-        tracks: data?.tracks || [],
-        totalPlays: data?.totalPlays || 0,
+        artist: artistData?.artist || null,
+        tracks: artistData?.tracks || [],
+        albums: statsData?.albums || [],
+        appearsInAlbums: statsData?.appearsInAlbums || [],
+        totalTrackCount: statsData?.totalTrackCount || 0,
+        totalPlaytime: statsData?.totalPlaytime || 0,
+        totalPlays: statsData?.totalPlays || 0,
+        totalAlbumCount: statsData?.totalAlbumCount || 0,
+        loading: artistFetching || artistPending,
+        error: artistError?.message || statsError?.message || null,
     }
 }

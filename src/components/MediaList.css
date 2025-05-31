@@ -298,14 +298,38 @@
     color: var(--font-color-secondary);
 }
 
-.media-list .media-item > .favorited {
-    padding: 6px;
+.media-list .media-item > .media-indicators {
+    display: flex;
+    align-items: center;
+}
+
+.media-list .media-item > .media-indicators:has(.favorited, .download-state) {
     margin-left: 8px;
+}
+
+.media-list .media-item > .media-indicators > .download-state {
+    display: flex;
+    align-items: center;
+}
+
+.media-list .media-item > .media-indicators > .download-state > .icon {
+    padding: 6px;
+    fill: var(--font-color-tertiary);
+    transition: fill 0.2s ease-out;
+}
+
+.media-list .media-item.playing > .media-indicators > .download-state > .icon,
+.media-list .media-item.paused > .media-indicators > .download-state > .icon {
+    fill: var(--font-color-secondary);
+}
+
+.media-list .media-item > .media-indicators > .favorited {
+    padding: 6px;
     color: var(--font-color-tertiary);
     transition: color 0.2s ease-out;
 }
 
-.media-list .media-item.playing > .favorited,
-.media-list .media-item.paused > .favorited {
+.media-list .media-item.playing > .media-indicators > .favorited,
+.media-list .media-item.paused > .media-indicators > .favorited {
     color: var(--font-color-secondary);
 }

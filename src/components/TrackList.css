@@ -291,14 +291,34 @@
     color: var(--font-color-secondary);
 }
 
-.tracklist > .track-item > .track-details > .favorited {
-    margin-top: 2px;
-    margin-right: 6px;
+.tracklist > .track-item > .track-details > .track-indicators {
+    display: flex;
+    align-items: center;
+}
+
+.tracklist > .track-item > .track-details > .track-indicators:has(.favorited, .download-state) {
+    margin-top: -1px;
+    margin-right: 3px;
+}
+
+.tracklist > .track-item > .track-details > .track-indicators > .download-state > .icon {
+    padding: 3px;
+    fill: var(--font-color-tertiary);
+    transition: fill 0.2s ease-out;
+}
+
+.tracklist > .track-item.playing > .track-details > .track-indicators > .download-state > .icon,
+.tracklist > .track-item.paused > .track-details > .track-indicators > .download-state > .icon {
+    fill: var(--font-color-secondary);
+}
+
+.tracklist > .track-item > .track-details > .track-indicators > .favorited {
+    padding: 3px;
     color: var(--font-color-tertiary);
     transition: color 0.2s ease-out;
 }
 
-.tracklist > .track-item.playing > .track-details > .favorited,
-.tracklist > .track-item.paused > .track-details > .favorited {
+.tracklist > .track-item.playing > .track-details > .track-indicators > .favorited,
+.tracklist > .track-item.paused > .track-details > .track-indicators > .favorited {
     color: var(--font-color-secondary);
 }

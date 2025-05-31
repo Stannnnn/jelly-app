@@ -1,0 +1,252 @@
+/* Downloads Page */
+.downloads-page {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* Storage Overview */
+.storage-overview {
+    background-color: var(--bg-color-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 8px;
+}
+
+.storage-stats {
+    display: flex;
+    gap: 32px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 120px;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--font-color);
+    margin-bottom: 4px;
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--font-color-secondary);
+    text-align: center;
+}
+
+/* Storage Bar */
+.storage-bar {
+    margin-top: 16px;
+}
+
+.storage-bar-container {
+    position: relative;
+    height: 8px;
+    background-color: var(--bg-color-tertiary);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 12px;
+}
+
+.storage-bar-used {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background-color: var(--font-color-tertiary);
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+.storage-bar-downloads {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    background-color: var(--brand-color);
+    border-radius: 4px;
+    transition: width 0.3s ease, left 0.3s ease;
+}
+
+.storage-legend {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.725rem;
+    color: var(--font-color-secondary);
+}
+
+.legend-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+}
+
+.legend-color.used {
+    background-color: var(--font-color-tertiary);
+}
+
+.legend-color.downloads {
+    background-color: var(--brand-color);
+}
+
+/* Downloads Content */
+.downloads-content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.downloads-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.header-info h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: var(--font-color);
+}
+
+.header-info p {
+    font-size: 0.85rem;
+    color: var(--font-color-secondary);
+    margin: 0;
+}
+
+.clear-all-button {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--font-color-inverted);
+    background-color: var(--error-font);
+    border: none;
+    border-radius: 6px;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, opacity 0.2s ease;
+    white-space: nowrap;
+}
+
+.clear-all-button:hover:not(:disabled) {
+    background-color: #d32f2f;
+}
+
+.clear-all-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Error Message */
+.error-message {
+    background-color: var(--error-background);
+    border: 1px solid var(--error-border);
+    color: var(--error-font);
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+}
+
+/* Empty State */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 48px 24px;
+    background-color: var(--bg-color-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    margin-top: 8px;
+}
+
+.empty-icon {
+    font-size: 3rem;
+    margin-bottom: 16px;
+    opacity: 0.6;
+}
+
+.empty-state h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--font-color);
+}
+
+.empty-state p {
+    font-size: 0.85rem;
+    color: var(--font-color-secondary);
+    line-height: 1.4;
+    margin-bottom: 20px;
+    max-width: 400px;
+}
+
+.browse-link {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--font-color-inverted);
+    background-color: var(--btn-brand-color);
+    padding: 8px 16px;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+}
+
+.browse-link:hover {
+    background-color: var(--btn-brand-color-hover);
+}
+
+/* Tracks Container */
+.tracks-container {
+    background-color: var(--bg-color-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+/* Responsive */
+@media only screen and (max-width: 700px) {
+    .storage-stats {
+        justify-content: space-around;
+        gap: 20px;
+    }
+
+    .stat-item {
+        min-width: 100px;
+    }
+
+    .downloads-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .storage-legend {
+        justify-content: space-around;
+    }
+
+    .legend-item {
+        font-size: 0.7rem;
+    }
+}

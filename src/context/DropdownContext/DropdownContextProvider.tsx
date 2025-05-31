@@ -1,9 +1,10 @@
+import { BaseItemKind } from '@jellyfin/sdk/lib/generated-client/models'
 import { ArrowLeftIcon, ChevronRightIcon } from '@primer/octicons-react'
 import { Fragment, ReactNode, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { BaseItemKind } from '../../../node_modules/@jellyfin/sdk/lib/generated-client/models/base-item-kind'
 import { MediaItem } from '../../api/jellyfin'
 import { useJellyfinPlaylistsList } from '../../hooks/Jellyfin/useJellyfinPlaylistsList'
+import { useDownloads } from '../../hooks/useDownloads'
 import { useFavorites } from '../../hooks/useFavorites'
 import { usePlaylists } from '../../hooks/usePlaylists'
 import { useJellyfinContext } from '../JellyfinContext/JellyfinContext'
@@ -50,7 +51,8 @@ const useInitialState = () => {
     const playback = usePlaybackContext()
     const { playlists } = useJellyfinPlaylistsList()
     const { addToFavorites, removeFromFavorites } = useFavorites()
-    const { addToPlaylist, removeFromPlaylist, createPlaylist, deletePlaylist } = usePlaylists()
+    const { addToDownloads, removeFromDownloads } = useDownloads()
+    const { addToPlaylist, addItemsToPlaylist, removeFromPlaylist, createPlaylist, deletePlaylist } = usePlaylists()
 
     const subMenuRef = useRef<HTMLDivElement>(null)
 
@@ -282,26 +284,42 @@ const useInitialState = () => {
         [isTouchDevice]
     )
 
-    const handlePlayNext = useCallback(() => {
-        if (context) {
-            const playlist = playback.currentPlaylist
-            const currentIndex = playback.currentTrackIndex
-            const insertIndex = currentIndex >= 0 ? currentIndex + 1 : playlist.length
-            const newPlaylist = [...playlist]
-            newPlaylist.splice(insertIndex, 0, context.item)
-            playback.setCurrentPlaylist({ playlist: newPlaylist, title: 'Direct Queue' })
-        }
-        closeDropdown()
-    }, [closeDropdown, playback, context])
+    const expandItems = useCallback(
+        async (item: MediaItem) => {
+            if (item.Type === BaseItemKind.MusicAlbum) {
+                const tracks = await api.getAlbumDetails(item.Id)
+                return tracks.tracks
+            } else if (item.Type === BaseItemKind.MusicArtist) {
+                const tracks = await api.getArtistDetails(item.Id)
+                return tracks.tracks
+            } else if (item.Type === BaseItemKind.Playlist) {
+                const tracks = await api.getPlaylistAllTracks(item.Id)
+                return tracks
+            } else {
+                return [item]
+            }
+        },
+        [api]
+    )
 
-    const handleAddToQueue = useCallback(
-        (item: MediaItem) => {
+    const handlePlayNext = useCallback(
+        async (item: MediaItem) => {
             const playlist = playback.currentPlaylist
-            const newPlaylist = [...playlist, item]
+            const newPlaylist = [...playlist, ...(await expandItems(item))]
             playback.setCurrentPlaylist({ playlist: newPlaylist, title: 'Direct Queue' })
             closeDropdown()
         },
-        [closeDropdown, playback]
+        [closeDropdown, expandItems, playback]
+    )
+
+    const handleAddToQueue = useCallback(
+        async (item: MediaItem) => {
+            const playlist = playback.currentPlaylist
+            const newPlaylist = [...playlist, ...(await expandItems(item))]
+            playback.setCurrentPlaylist({ playlist: newPlaylist, title: 'Direct Queue' })
+            closeDropdown()
+        },
+        [closeDropdown, expandItems, playback]
     )
 
     // Actually working
@@ -332,7 +350,7 @@ const useInitialState = () => {
             next: (
                 <div
                     className="dropdown-item play-next"
-                    onClick={() => handlePlayNext()}
+                    onClick={async () => await handlePlayNext(context!.item)}
                     onMouseEnter={closeSubDropdown}
                 >
                     <span>Play next</span>
@@ -341,7 +359,7 @@ const useInitialState = () => {
             add_to_queue: (
                 <div
                     className="dropdown-item add-queue"
-                    onClick={() => handleAddToQueue(context!.item)}
+                    onClick={async () => await handleAddToQueue(context!.item)}
                     onMouseEnter={closeSubDropdown}
                 >
                     <span>Add to queue</span>
@@ -531,7 +549,7 @@ const useInitialState = () => {
                                             closeDropdown()
 
                                             if (context) {
-                                                await addToPlaylist(context.item, playlist.Id)
+                                                await addItemsToPlaylist(await expandItems(context.item), playlist.Id)
                                             }
                                         }}
                                     >
@@ -556,15 +574,75 @@ const useInitialState = () => {
                     <span>Remove from playlist</span>
                 </div>
             ) : null,
+            download_song:
+                context?.item.offlineState === 'downloaded' ? (
+                    <div
+                        className="dropdown-item remove-song has-removable"
+                        onClick={async () => {
+                            closeDropdown()
+
+                            if (context) {
+                                removeFromDownloads(
+                                    (await expandItems(context.item)).map(i => i.Id),
+                                    context.item.Type === BaseItemKind.Audio ? undefined : context.item.Id
+                                )
+                            }
+                        }}
+                        onMouseEnter={closeSubDropdown}
+                    >
+                        <span>
+                            Remove{' '}
+                            {context?.item.Type === BaseItemKind.Audio
+                                ? 'song'
+                                : context?.item.Type === BaseItemKind.MusicAlbum
+                                ? 'album'
+                                : context?.item.Type === BaseItemKind.MusicArtist
+                                ? 'artist'
+                                : context?.item.Type === BaseItemKind.Playlist
+                                ? 'playlist'
+                                : ''}
+                        </span>
+                    </div>
+                ) : !context?.item.offlineState ? (
+                    <div
+                        className="dropdown-item"
+                        onClick={async () => {
+                            closeDropdown()
+
+                            if (context) {
+                                addToDownloads(
+                                    (await expandItems(context.item)).map(i => i.Id),
+                                    context.item.Type === BaseItemKind.Audio ? undefined : context.item.Id
+                                )
+                            }
+                        }}
+                        onMouseEnter={closeSubDropdown}
+                    >
+                        <span>
+                            Download{' '}
+                            {context?.item.Type === BaseItemKind.Audio
+                                ? 'song'
+                                : context?.item.Type === BaseItemKind.MusicAlbum
+                                ? 'album'
+                                : context?.item.Type === BaseItemKind.MusicArtist
+                                ? 'artist'
+                                : context?.item.Type === BaseItemKind.Playlist
+                                ? 'playlist'
+                                : ''}
+                        </span>
+                    </div>
+                ) : null,
         }
     }, [
+        addItemsToPlaylist,
+        addToDownloads,
         addToFavorites,
-        addToPlaylist,
         api,
         closeDropdown,
         closeSubDropdown,
         context,
         deletePlaylist,
+        expandItems,
         handleAddToQueue,
         handleCreateClick,
         handleInputChange,
@@ -578,6 +656,7 @@ const useInitialState = () => {
         playback,
         playlistName,
         playlists,
+        removeFromDownloads,
         removeFromFavorites,
         removeFromPlaylist,
         subDropdown.flipX,
@@ -658,11 +737,19 @@ const useInitialState = () => {
             const menuItemz: { isVisible: boolean; node: ReactNode }[][] = [
                 [
                     {
-                        isVisible: !hidden?.next && context?.item.Type === BaseItemKind.Audio,
+                        isVisible:
+                            !hidden?.next &&
+                            (context?.item.Type === BaseItemKind.Audio ||
+                                context?.item.Type === BaseItemKind.MusicAlbum ||
+                                context?.item.Type === BaseItemKind.MusicArtist),
                         node: menuItems.next,
                     },
                     {
-                        isVisible: !hidden?.add_to_queue && context?.item.Type === BaseItemKind.Audio,
+                        isVisible:
+                            !hidden?.add_to_queue &&
+                            (context?.item.Type === BaseItemKind.Audio ||
+                                context?.item.Type === BaseItemKind.MusicAlbum ||
+                                context?.item.Type === BaseItemKind.MusicArtist),
                         node: menuItems.add_to_queue,
                     },
                     {
@@ -698,16 +785,31 @@ const useInitialState = () => {
                         node: menuItems.remove_from_favorite,
                     },
                     {
-                        isVisible: !hidden?.add_to_playlist && context?.item.Type === BaseItemKind.Audio,
-                        node: menuItems.add_to_playlist,
-                    },
-                    {
                         isVisible: !!(!hidden?.remove_from_playlist && context?.item.Type === BaseItemKind.Audio),
                         node: menuItems.remove_from_playlist,
                     },
                     {
+                        isVisible:
+                            !hidden?.add_to_playlist &&
+                            (context?.item.Type === BaseItemKind.Audio ||
+                                context?.item.Type === BaseItemKind.MusicAlbum ||
+                                context?.item.Type === BaseItemKind.MusicArtist),
+                        node: menuItems.add_to_playlist,
+                    },
+                    {
                         isVisible: !hidden?.delete_playlist && context?.item.Type === BaseItemKind.Playlist,
                         node: menuItems.delete_playlist,
+                    },
+                ],
+                [
+                    {
+                        isVisible:
+                            !hidden?.download_song &&
+                            (context?.item.Type === BaseItemKind.Audio ||
+                                context?.item.Type === BaseItemKind.MusicAlbum ||
+                                context?.item.Type === BaseItemKind.MusicArtist ||
+                                context?.item.Type === BaseItemKind.Playlist),
+                        node: menuItems.download_song,
                     },
                 ],
             ]
@@ -752,6 +854,7 @@ const useInitialState = () => {
         hidden?.add_to_playlist,
         hidden?.add_to_queue,
         hidden?.delete_playlist,
+        hidden?.download_song,
         hidden?.instant_mix,
         hidden?.next,
         hidden?.remove_from_favorite,
@@ -765,6 +868,7 @@ const useInitialState = () => {
         menuItems.add_to_playlist,
         menuItems.add_to_queue,
         menuItems.delete_playlist,
+        menuItems.download_song,
         menuItems.instant_mix,
         menuItems.next,
         menuItems.remove_from_favorite,

@@ -450,14 +450,16 @@ const Progressbar = () => {
         progressRef.current?.style.setProperty('--transition-duration', `0s`)
         progressRef.current?.style.setProperty('--progress-width', `${calcProgress()}%`)
 
-        void progressRef.current?.offsetWidth // Trigger reflow
+        if (playback.isPlaying) {
+            void progressRef.current?.offsetWidth // Trigger reflow
 
-        progressRef.current?.style.setProperty(
-            '--transition-duration',
-            `${calcDuration() - (audio?.currentTime || 0)}s`
-        )
-        progressRef.current?.style.setProperty('--progress-width', `100%`)
-    }, [audio?.currentTime, calcDuration, calcProgress])
+            progressRef.current?.style.setProperty(
+                '--transition-duration',
+                `${calcDuration() - (audio?.currentTime || 0)}s`
+            )
+            progressRef.current?.style.setProperty('--progress-width', `100%`)
+        }
+    }, [audio?.currentTime, calcDuration, calcProgress, playback.isPlaying])
 
     const calcBuffered = useCallback(() => {
         if (!audio) return 0
