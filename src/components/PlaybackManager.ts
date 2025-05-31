@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { MediaItem } from '../api/jellyfin'
 import { useJellyfinContext } from '../context/JellyfinContext/JellyfinContext'
 import { IJellyfinInfiniteProps, useJellyfinInfiniteData } from '../hooks/Jellyfin/Infinite/useJellyfinInfiniteData'
+import { LyricDto } from '@jellyfin/sdk/lib/generated-client'
 
 export type IReviver = {
     queryKey: unknown[]
@@ -24,6 +25,9 @@ export const usePlaybackManager = ({ initialVolume, clearOnLogout }: PlaybackMan
         const saved = localStorage.getItem('sessionPlayCount')
         return saved ? Number(saved) : 0
     })
+    // Whether the lyrics display is enabled
+    const [lyricsOpen, setLyricsOpen] = useState(false)
+    const [lyricsExpanded, setLyricsExpanded] = useState(false)
     const [currentTrackIndex, setCurrentTrackIndex] = useState({
         index: localStorage.getItem('currentTrackIndex') ? Number(localStorage.getItem('currentTrackIndex')) : -1,
     })
@@ -113,6 +117,25 @@ export const usePlaybackManager = ({ initialVolume, clearOnLogout }: PlaybackMan
             null
         )
     }, [currentShuffledIndex.index, currentTrackIndex.index, items, shuffle])
+
+    const [currentTrackLyricsLoading, setCurrentTrackLyricsLoading] = useState(false)
+    const [currentTrackLyrics, setCurrentTrackLyrics] = useState<LyricDto | null>(null)
+    useEffect(() => {
+        const id = currentTrack?.Id
+        setCurrentTrackLyricsLoading(true)
+        setCurrentTrackLyrics(null)
+        if (id)
+            api.getTrackLyrics(id)
+                .then((v: LyricDto) => {
+                    if (currentTrack.Id === id) setCurrentTrackLyrics(v)
+                })
+                .catch(_ => {
+                    setCurrentTrackLyrics(null)
+                })
+                .finally(() => {
+                    setCurrentTrackLyricsLoading(false)
+                })
+    }, [currentTrack, api])
 
     // Update Media Session metadata
     const updateMediaSessionMetadata = useCallback(
@@ -455,6 +478,23 @@ export const usePlaybackManager = ({ initialVolume, clearOnLogout }: PlaybackMan
         }
     }, [currentShuffledIndex.index, currentTrack, currentTrackIndex.index, items, repeat, shuffle])
 
+    const toggleLyrics = () => {
+        setLyricsOpen(prev => {
+            const newLyricsOpen = !prev
+            if (!newLyricsOpen) setLyricsExpanded(false)
+            return newLyricsOpen
+        })
+    }
+
+    const toggleExpandLyrics = () => {
+        setLyricsExpanded(prev => {
+            if (!lyricsOpen) return false
+
+            const newLyricsExpanded = !prev
+            return newLyricsExpanded
+        })
+    }
+
     const toggleShuffle = () => {
         setShuffle(prev => {
             const newShuffle = !prev
@@ -667,6 +707,10 @@ export const usePlaybackManager = ({ initialVolume, clearOnLogout }: PlaybackMan
         currentTrackIndex: shuffle
             ? shuffledPlaylist.current.indexOf(currentShuffledIndex.index)
             : currentTrackIndex.index,
+        currentTrackLyricsLoading,
+        currentTrackLyrics,
+        lyricsOpen,
+        lyricsExpanded,
         isPlaying,
         togglePlayPause,
         formatTime,
@@ -679,6 +723,8 @@ export const usePlaybackManager = ({ initialVolume, clearOnLogout }: PlaybackMan
         nextTrack,
         previousTrack,
         shuffle,
+        toggleLyrics,
+        toggleExpandLyrics,
         toggleShuffle,
         repeat,
         toggleRepeat,

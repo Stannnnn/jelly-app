@@ -1,5 +1,5 @@
-import { ArrowLeftIcon, BookmarkFillIcon, ChevronDownIcon, HeartFillIcon } from '@primer/octicons-react'
-import { JSX, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { ArrowLeftIcon, BookmarkFillIcon, ChevronDownIcon, HeartFillIcon, NoteIcon } from '@primer/octicons-react'
+import { JSX, memo, RefObject, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useFilterContext } from '../context/FilterContext/FilterContext'
 import { FilterContextProvider } from '../context/FilterContext/FilterContextProvider'
@@ -124,6 +124,14 @@ export const MainContent = ({
     const memoFooter = useMemo(() => {
         return (
             <div className="main_footer">
+                {playback.lyricsOpen && (
+                    <div className={playback.lyricsExpanded ? 'container expanded lyrics' : 'container lyrics'}>
+                        <div className="header" onClick={playback.toggleExpandLyrics}>
+                            <ChevronDownIcon className="icon" size={12} />
+                        </div>
+                        <LyricsDisplay />
+                    </div>
+                )}
                 <div
                     className={
                         playback.isPlaying ? 'playback playing' : playback.currentTrack ? 'playback paused' : 'playback'
@@ -192,6 +200,22 @@ export const MainContent = ({
                         </div>
                         <div className="controls">
                             <div className="knobs">
+                                {
+                                    <div
+                                        className={`shuffle ${playback.lyricsOpen ? 'active' : ''}`}
+                                        onClick={playback.toggleLyrics}
+                                        title="Lyrics"
+                                    >
+                                        <NoteIcon
+                                            fill={
+                                                playback.lyricsOpen
+                                                    ? 'var(--brand-color)'
+                                                    : 'var(--font-color-secondary)'
+                                            }
+                                            size={16}
+                                        />
+                                    </div>
+                                }
                                 <div
                                     className={`shuffle ${playback.shuffle ? 'active' : ''}`}
                                     onClick={playback.toggleShuffle}
@@ -240,6 +264,10 @@ export const MainContent = ({
         playback.togglePlayPause,
         playback.toggleRepeat,
         playback.toggleShuffle,
+        playback.toggleLyrics,
+        playback.toggleExpandLyrics,
+        playback.lyricsOpen,
+        playback.lyricsExpanded,
     ])
 
     return (
@@ -248,6 +276,146 @@ export const MainContent = ({
             {memoContent}
             {memoFooter}
         </main>
+    )
+}
+
+const LyricsDisplay = () => {
+    const playback = usePlaybackContext()
+    const audio = playback.audioRef.current as HTMLAudioElement | undefined
+
+    const [currentTime, setCurrentTime] = useState<number | null>(null)
+
+    function tickToTimeString(raw: number): string {
+        const ms = raw / 10000
+
+        const totalCs = Math.round(ms / 10)
+
+        const cs = totalCs % 100
+        const totalSeconds = Math.floor(totalCs / 100)
+        const seconds = totalSeconds % 60
+        const totalMinutes = Math.floor(totalSeconds / 60)
+        const minutes = totalMinutes % 60
+        const hours = Math.floor(totalMinutes / 60)
+
+        const hh = hours.toString().padStart(2, '0')
+        const mm = minutes.toString().padStart(2, '0')
+        const ss = seconds.toString().padStart(2, '0')
+        const cc = cs.toString().padStart(2, '0')
+
+        return (hours > 0 ? `${hh}:` : '') + `${mm}:${ss}.${cc}`
+    }
+
+    const timeDiff = (startTicks: number | null, timeSecs: number | null) => {
+        return (startTicks || 0) / 10000 - (timeSecs || 0) * 1000
+    }
+
+    const lyrics = playback.currentTrackLyrics?.Lyrics
+    const currentLineIndex = useMemo(() => {
+        if (!audio || !lyrics) return -1
+
+        const index = lyrics.findIndex(line => timeDiff(line?.Start || 0, currentTime) > 0)
+
+        return lyrics ? (index >= 0 ? index - 1 : lyrics.length - 1) : -1
+    }, [audio, lyrics, currentTime])
+    const nextLineStart = useMemo(() => {
+        if (!audio || !lyrics) return -1
+
+        if (lyrics && lyrics[currentLineIndex + 1]) return lyrics[currentLineIndex + 1]?.Start || 0
+        return 0
+    }, [audio, lyrics, currentLineIndex])
+
+    // Uses timeout for precise lyrics timing
+    //  - Necessary because audio time updates happen every 200ms or so; too slow
+    const nextLineTimeout: RefObject<NodeJS.Timeout | null> = useRef(null)
+    useEffect(() => {
+        if (nextLineTimeout.current) {
+            clearTimeout(nextLineTimeout.current)
+            nextLineTimeout.current = null
+        }
+        const millis = timeDiff(nextLineStart, currentTime)
+        if (millis > 0) {
+            nextLineTimeout.current = setTimeout(() => {
+                if (currentTime && playback.isPlaying) setCurrentTime(currentTime + millis / 1000)
+                if (nextLineTimeout.current) {
+                    clearTimeout(nextLineTimeout.current)
+                    nextLineTimeout.current = null
+                }
+            }, millis)
+        }
+    }, [playback.isPlaying, currentTime, currentLineIndex, nextLineStart])
+
+    useEffect(() => {
+        if (!audio || !lyrics) return
+
+        const handleTimeUpdate = () => {
+            if (!audio.duration) {
+                setCurrentTime(null)
+                return
+            }
+
+            setCurrentTime(audio?.currentTime || 0)
+        }
+
+        const handlePlaying = () => {
+            setCurrentTime(0)
+        }
+
+        audio.addEventListener('timeupdate', handleTimeUpdate)
+        audio.addEventListener('playing', handlePlaying)
+
+        return () => {
+            audio.removeEventListener('timeupdate', handleTimeUpdate)
+            audio.removeEventListener('playing', handlePlaying)
+        }
+    }, [audio, lyrics, currentLineIndex])
+
+    const lineRefs = useRef<Array<HTMLDivElement | null>>([])
+    const displayedLines = useMemo(() => {
+        if (!lyrics) lineRefs.current = []
+        return (
+            lyrics?.map((line, index) => (
+                <div
+                    key={`lyrics-${playback.currentTrack.Id}-${index}`}
+                    className={'lyrics-line' + (currentLineIndex === index ? ' active' : '')}
+                    ref={el => {
+                        lineRefs.current[index] = el
+                    }}
+                >
+                    <div className="start">{line.Start && tickToTimeString(line.Start)}</div>
+                    <div className="text">{line.Text}</div>
+                </div>
+            )) || null
+        )
+    }, [playback.currentTrack, lyrics, currentLineIndex])
+
+    const lyricsContainer = useRef<HTMLDivElement | null>(null)
+
+    useEffect(() => {
+        if (!lyrics) return
+        const activeEl = lineRefs.current[currentLineIndex]
+        if (lyricsContainer.current)
+            lyricsContainer.current.scrollTo({
+                top:
+                    (activeEl?.offsetTop || 0) -
+                    lyricsContainer.current.clientHeight / 2 +
+                    (activeEl?.clientHeight || 0) / 2,
+                behavior: 'smooth',
+            })
+    }, [playback.currentTrack, lyrics, currentLineIndex])
+
+    return (
+        <div
+            className="scroll-container"
+            ref={el => {
+                lyricsContainer.current = el
+            }}
+        >
+            <div className={'lyrics-display' + (lyrics ? ' active' : '')}>
+                {(lyrics && displayedLines) || (playback.currentTrackLyricsLoading && <div>Loading...</div>) || (
+                    <div style={{ textAlign: 'center' }}>No Lyrics</div>
+                )}
+            </div>
+        </div>
     )
 }
 

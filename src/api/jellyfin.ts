@@ -1,5 +1,5 @@
 import { Jellyfin } from '@jellyfin/sdk'
-import { InstantMixApi, PlaylistsApi } from '@jellyfin/sdk/lib/generated-client'
+import { InstantMixApi, LyricsApi, PlaylistsApi } from '@jellyfin/sdk/lib/generated-client'
 import { ArtistsApi } from '@jellyfin/sdk/lib/generated-client/api/artists-api'
 import { GenresApi } from '@jellyfin/sdk/lib/generated-client/api/genres-api'
 import { ItemsApi } from '@jellyfin/sdk/lib/generated-client/api/items-api'
@@ -667,6 +667,15 @@ export const initJellyfinApi = ({ serverUrl, userId, token }: { serverUrl: strin
         return response.data.Items as MediaItem[]
     }
 
+    const getTrackLyrics = async (trackId: string) => {
+        const lyricsApi = new LyricsApi(api.configuration)
+        const response = await lyricsApi.getLyrics({
+            itemId: trackId,
+        })
+
+        return response.data
+    }
+
     const fetchAllTracks = async (artistId: string): Promise<MediaItem[]> => {
         const itemsApi = new ItemsApi(api.configuration)
         const response = await itemsApi.getItems(
@@ -916,6 +925,7 @@ export const initJellyfinApi = ({ serverUrl, userId, token }: { serverUrl: strin
         getPlaylistTotals,
         getPlaylistTracks,
         getAllPlaylists,
+        getTrackLyrics,
         fetchAllTracks,
         fetchPlaylistMetadata,
         fetchRecentlyPlayed,
