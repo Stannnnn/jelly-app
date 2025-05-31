@@ -1,4 +1,4 @@
-import { InfiniteData, useQueryClient } from '@tanstack/react-query'
+import { InfiniteData, useQuery, useQueryClient } from '@tanstack/react-query'
 import Hls, { FragmentLoaderContext, HlsConfig, LoaderCallbacks, LoaderConfiguration } from 'hls.js'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { MediaItem } from '../api/jellyfin'
@@ -121,24 +121,23 @@ export const usePlaybackManager = ({ initialVolume, clearOnLogout }: PlaybackMan
         )
     }, [currentShuffledIndex.index, currentTrackIndex.index, items, shuffle])
 
-    const [currentTrackLyricsLoading, setCurrentTrackLyricsLoading] = useState(false)
-    const [currentTrackLyrics, setCurrentTrackLyrics] = useState<LyricDto | null>(null)
-    useEffect(() => {
-        const id = currentTrack?.Id
-        setCurrentTrackLyricsLoading(true)
-        setCurrentTrackLyrics(null)
-        if (id)
-            api.getTrackLyrics(id)
-                .then((v: LyricDto) => {
-                    if (currentTrack.Id === id) setCurrentTrackLyrics(v)
-                })
-                .catch(_ => {
-                    setCurrentTrackLyrics(null)
-                })
-                .finally(() => {
-                    setCurrentTrackLyricsLoading(false)
-                })
-    }, [currentTrack, api])
+    const { data: currentTrackLyrics, isLoading: currentTrackLyricsLoading } = useQuery<LyricDto | null>({
+        queryKey: useMemo(() => [`lyrics-${currentTrack?.Id || null}`], [currentTrack]),
+        queryFn: async () => {
+            const id = currentTrack?.Id
+
+            if (id) {
+                try {
+                    return await api.getTrackLyrics(id)
+                } catch {
+                    // On error we just assume there are no lyrics
+                    return null
+                }
+            }
+
+            return null
+        },
+    })
 
     // Update Media Session metadata
     const updateMediaSessionMetadata = useCallback(

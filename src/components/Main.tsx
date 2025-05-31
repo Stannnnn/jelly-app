@@ -200,22 +200,18 @@ export const MainContent = ({
                         </div>
                         <div className="controls">
                             <div className="knobs">
-                                {
-                                    <div
-                                        className={`shuffle ${playback.lyricsOpen ? 'active' : ''}`}
-                                        onClick={playback.toggleLyrics}
-                                        title="Lyrics"
-                                    >
-                                        <NoteIcon
-                                            fill={
-                                                playback.lyricsOpen
-                                                    ? 'var(--brand-color)'
-                                                    : 'var(--font-color-secondary)'
-                                            }
-                                            size={16}
-                                        />
-                                    </div>
-                                }
+                                <div
+                                    className={`lyrics ${playback.shuffle ? 'active' : ''}`}
+                                    onClick={playback.toggleLyrics}
+                                    title="Lyrics"
+                                >
+                                    <NoteIcon
+                                        fill={
+                                            playback.lyricsOpen ? 'var(--brand-color)' : 'var(--font-color-secondary)'
+                                        }
+                                        size={16}
+                                    />
+                                </div>
                                 <div
                                     className={`shuffle ${playback.shuffle ? 'active' : ''}`}
                                     onClick={playback.toggleShuffle}
@@ -327,22 +323,27 @@ const LyricsDisplay = () => {
     // Uses timeout for precise lyrics timing
     //  - Necessary because audio time updates happen every 200ms or so; too slow
     const nextLineTimeout: RefObject<NodeJS.Timeout | null> = useRef(null)
-    useEffect(() => {
+    const clearNextLineTimeout = () => {
         if (nextLineTimeout.current) {
             clearTimeout(nextLineTimeout.current)
             nextLineTimeout.current = null
         }
+    }
+    useEffect(() => {
+        clearNextLineTimeout()
         const millis = timeDiff(nextLineStart, currentTime)
         if (millis > 0) {
+            // Sets timeout to diff from next line and last currentTime update
             nextLineTimeout.current = setTimeout(() => {
                 if (currentTime && playback.isPlaying) setCurrentTime(currentTime + millis / 1000)
-                if (nextLineTimeout.current) {
-                    clearTimeout(nextLineTimeout.current)
-                    nextLineTimeout.current = null
-                }
+                clearNextLineTimeout()
             }, millis)
         }
     }, [playback.isPlaying, currentTime, currentLineIndex, nextLineStart])
+
+    useEffect(() => {
+        clearNextLineTimeout()
+    }, [audio, lyrics])
 
     useEffect(() => {
         if (!audio || !lyrics) return
@@ -404,12 +405,7 @@ const LyricsDisplay = () => {
     }, [playback.currentTrack, lyrics, currentLineIndex])
 
     return (
-        <div
-            className="scroll-container"
-            ref={el => {
-                lyricsContainer.current = el
-            }}
-        >
+        <div className="scroll-container" ref={lyricsContainer}>
             <div className={'lyrics-display' + (lyrics ? ' active' : '')}>
                 {(lyrics && displayedLines) || (playback.currentTrackLyricsLoading && <div>Loading...</div>) || (
                     <div style={{ textAlign: 'center' }}>No Lyrics</div>

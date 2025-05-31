@@ -679,6 +679,10 @@ body.lockscroll {
     --lyrics-header-height: fit-content;
 }
 
+.main > .main_footer > .playback > .container > .controls > .knobs > .lyrics {
+    cursor: pointer;
+}
+
 /* Expand header on mobile screens to be easier to access with touch */
 @media only screen and (max-width: 800px) {
     .main > .main_footer > .lyrics.container * {
