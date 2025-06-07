@@ -102,6 +102,11 @@
 
 /* Playback */
 .settings-page > .section.playback > .inner {
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+}
+
+.settings-page > .section.playback > .inner:last-child {
     margin-bottom: 16px;
     padding-bottom: 16px;
     border-bottom: 1px solid var(--border-color);
@@ -136,6 +141,10 @@
     font-size: 0.725rem;
     line-height: 1.4;
     color: var(--font-color-tertiary);
+}
+
+.settings-page > .section.playback > .inner > .container > .switch {
+    align-self: center;
 }
 
 .settings-page > .section.playback > .inner > .container > .options {

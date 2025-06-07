@@ -405,6 +405,12 @@ body.lockscroll {
 
 /* Main */
 .main {
+    --header-height: 53px;
+    --progress-bar-height: 4px;
+    --footer-height: 80px;
+}
+
+.main {
     display: flex;
     flex-direction: column;
     width: 100%;
@@ -420,7 +426,7 @@ body.lockscroll {
     align-items: center;
     justify-content: space-between;
     padding: 12px;
-    max-height: 53px;
+    max-height: var(--header-height);
     background-color: var(--bg-color);
     border-bottom: 1px solid var(--border-color);
 }
@@ -633,7 +639,7 @@ body.lockscroll {
     position: relative;
     display: flex;
     height: 8px;
-    margin-top: -4px;
+    margin-top: calc(0 - var(--progress-bar-height));
     transform: scaleY(0.6);
     transition: transform 0.1s linear;
 }
@@ -737,7 +743,123 @@ body.lockscroll {
     justify-content: space-between;
     padding: 14px 20px;
     /* Help with CJK letter spacing */
-    max-height: 76px;
+    max-height: calc(var(--footer-height) - var(--progress-bar-height));
+}
+
+/* Lyrics Display */
+.main_lyrics * {
+    --lyrics-border-margin: 35px;
+    --lyrics-horizontal-margin: 20px;
+    --lyrics-vertical-margin: 3px;
+}
+
+.main > .main_footer > .playback > .container > .controls > .knobs > .lyrics {
+    cursor: pointer;
+}
+
+.main_lyrics {
+    position: sticky;
+    z-index: 1;
+
+    font-family: var(--system-fonts);
+    font-family: var(--inter-font);
+
+    background-color: var(--bg-color);
+
+    top: var(--header-height);
+    height: calc(100vh - (var(--header-height) + var(--footer-height)));
+    width: inherit;
+}
+
+.main_lyrics > .scroll-container {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+
+    display: block;
+    transition: 0.5s;
+
+    overflow-y: auto;
+}
+
+.main_lyrics > .scroll-container > .lyrics-display {
+    width: 100%;
+
+    min-height: var(--lyrics-collapsed-height);
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: stretch;
+    justify-content: center;
+}
+
+.main_lyrics > .scroll-container > .lyrics-display .status {
+    margin: 10px;
+    text-align: center;
+}
+
+.main_lyrics > .scroll-container > .lyrics-display .lyrics-line {
+    display: flex;
+
+    padding-left: 10px;
+}
+
+.main_lyrics > .scroll-container > .lyrics-display .lyrics-line > * {
+    align-content: center;
+}
+
+.main_lyrics > .scroll-container > .lyrics-display .lyrics-line > .start {
+    font-variant-numeric: tabular-nums;
+    font-size: 0.9em;
+}
+
+.main_lyrics > .scroll-container > .lyrics-display .lyrics-line > .text {
+    margin-left: var(--lyrics-horizontal-margin);
+    margin-right: var(--lyrics-horizontal-margin);
+
+    margin-top: var(--lyrics-vertical-margin);
+    margin-bottom: var(--lyrics-vertical-margin);
+
+    flex: 1;
+}
+
+.main_lyrics > .scroll-container > .lyrics-display .lyrics-line > .text.centered {
+    text-align: center;
+}
+
+.main_lyrics > .scroll-container > .lyrics-display.active:first-child {
+    margin-top: var(--lyrics-border-margin);
+}
+
+.main_lyrics > .scroll-container > .lyrics-display.active:last-child {
+    margin-bottom: var(--lyrics-border-margin);
+}
+
+.main_lyrics > .scroll-container > .lyrics-display .lyrics-line {
+    cursor: default;
+}
+
+.main_lyrics > .scroll-container > .lyrics-display .lyrics-line:hover {
+    background-color: var(--bg-color-secondary);
+}
+
+.main_lyrics > .scroll-container > .lyrics-display.synced .lyrics-line {
+    font-weight: lighter;
+}
+
+.main_lyrics > .scroll-container > .lyrics-display.synced .lyrics-line.active {
+    font-weight: bold;
+}
+
+.main_lyrics > .scroll-container > .lyrics-display.synced .lyrics-line {
+    cursor: pointer;
+}
+
+.main_lyrics > .scroll-container > .lyrics-display.synced .lyrics-line:active {
+    filter: brightness(0.9);
 }
 
 /* Track details */
