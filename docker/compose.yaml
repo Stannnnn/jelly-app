@@ -1,0 +1,10 @@
+services:
+  jelly-app:
+    image: ghcr.io/qunu/jelly-app:latest
+    ports:
+      - "8080:80"
+    env_file:
+      - .env
+    environment:
+      - VITE_DEFAULT_JELLYFIN_URL=${VITE_DEFAULT_JELLYFIN_URL}
+      - VITE_LOCK_JELLYFIN_URL=${VITE_LOCK_JELLYFIN_URL}
