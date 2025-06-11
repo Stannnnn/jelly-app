@@ -82,12 +82,12 @@ Jelly Music App is available as a production build, ready to deploy on an existi
 
 Alternatively, you can run the development server directly: `yarn dev` or `yarn dev:nocache`
 
-#### Docker Deployment
+### Docker Deployment
 
 You can now deploy Jelly Music App using Docker, with the option to set a default or locked Jellyfin server URL with the .env file for simplified self-hosting.
 
 
-🔧 Using Docker Compose (Recommended)
+#### 🔧 Using Docker Compose (Recommended)
 
 The Jelly Music App image is available at:
 
@@ -112,7 +112,7 @@ Create a .env file in the same directory to define your environment variables:
   VITE_DEFAULT_JELLYFIN_URL=https://demo.jellyfin.org/stable
   VITE_LOCK_JELLYFIN_URL=true
   ```
-🐳 Building the Image Manually (Optional)
+#### 🐳 Building the Image Manually (Optional)
 
 If you prefer to build the image manually:
   ```bash
