@@ -136,8 +136,6 @@ To run the app directly:
 
   ```
 
-**Note**: Environment variables must be set during the Docker build process, as setting them at runtime (e.g., via -e in `docker run`) will not work.
-
 ### Contributing
 
 We're open to pull requests, please merge them to the `develop` branch. If you have any suggestions or improvements, feel free to open an issue or submit a pull request. Your contributions are welcome and appreciated!
