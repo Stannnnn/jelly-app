@@ -112,7 +112,7 @@ services:
       - VITE_LOCK_JELLYFIN_URL=${VITE_LOCK_JELLYFIN_URL}
 ```
 
-#### ➕ `.env` Example
+#### `.env` Example
 
 Create a `.env` file in the same directory:
 
@@ -135,7 +135,7 @@ VITE_LOCK_JELLYFIN_URL=true
 To build the Docker image yourself:
 
 ```bash
-docker build . --tag jelly-app:latest
+docker build . --tag jelly-app
 ```
 
 ---
