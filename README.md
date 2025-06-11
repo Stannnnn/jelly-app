@@ -115,23 +115,25 @@ Create a .env file in the same directory to define your environment variables:
 
 Examples in docker folder
 
+  -   `VITE_DEFAULT_JELLYFIN_URL`: Sets the default Jellyfin server URL loaded on first app access if no URL is stored in Local Storage.
+  -   `VITE_LOCK_JELLYFIN_URL`: If set to `true`, removes the URL input field and enforces the default URL for all connections, ideal for self-hosted instances tied to a single server.
+
 #### 🐳 Building the Image Manually (Optional)
 
 If you prefer to build the image manually:
   ```bash
   docker build . \
-  --build-arg VITE_DEFAULT_JELLYFIN_URL=https://demo.jellyfin.org/stable \
-  --build-arg VITE_LOCK_JELLYFIN_URL=true \
   --tag jelly-app
   ```
-
-  -   `VITE_DEFAULT_JELLYFIN_URL`: Sets the default Jellyfin server URL loaded on first app access if no URL is stored in Local Storage.
-  -   `VITE_LOCK_JELLYFIN_URL`: If set to `true`, removes the URL input field and enforces the default URL for all connections, ideal for self-hosted instances tied to a single server.
 
 ▶️ Running the Container
 To run the app directly:
   ```bash
-  docker run --rm -p 80:80 jelly-app:latest
+  docker run --rm -p 80:80 \
+  -e VITE_DEFAULT_JELLYFIN_URL=${VITE_DEFAULT_JELLYFIN_URL} \
+  -e VITE_LOCK_JELLYFIN_URL=${VITE_LOCK_JELLYFIN_URL} \
+  jelly-app:latest
+
   ```
 
 **Note**: Environment variables must be set during the Docker build process, as setting them at runtime (e.g., via -e in `docker run`) will not work.
