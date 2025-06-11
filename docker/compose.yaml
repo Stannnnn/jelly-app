@@ -1,8 +1,8 @@
 services:
   jelly-app:
-    image: ghcr.io/qunu/jelly-app:latest
+    image: ghcr.io/Stannnnn/jelly-app:latest
     ports:
-      - "8080:80"
+      - "80:80"
     env_file:
       - .env
     environment:
