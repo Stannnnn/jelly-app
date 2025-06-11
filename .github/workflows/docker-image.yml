@@ -1,18 +1,38 @@
-name: Docker Image CI
+name: Publish Docker Image to GHCR
 
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+    branches:
+      - main
+    tags:
+      - 'v*'  # Runs when you push a tag like v1.0.0
+  workflow_dispatch:
 
 jobs:
-
-  build:
-
+  build-and-push:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Build the Docker image
-      run: docker build . --build-arg VITE_DEFAULT_JELLYFIN_URL=https://media.poveycloud.top --build-arg VITE_LOCK_JELLYFIN_URL=true --tag jelly-app
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        run: echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Extract version tag
+        id: version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+
+      - name: Build and Push Docker Image (Multi-Platform)
+        run: |
+          docker buildx create --use
+          docker buildx build \
+            --platform linux/amd64,linux/arm64 \
+            --build-arg VITE_DEFAULT_JELLYFIN_URL=https://media.poveycloud.top \
+            --build-arg VITE_LOCK_JELLYFIN_URL=true \
+            -t ghcr.io/${{ github.repository_owner }}/jelly-app:latest \
+            -t ghcr.io/${{ github.repository_owner }}/jelly-app:${{ env.VERSION }} \
+            --push .
