@@ -112,6 +112,9 @@ Create a .env file in the same directory to define your environment variables:
   VITE_DEFAULT_JELLYFIN_URL=https://demo.jellyfin.org/stable
   VITE_LOCK_JELLYFIN_URL=true
   ```
+
+Examples in docker folder
+
 #### 🐳 Building the Image Manually (Optional)
 
 If you prefer to build the image manually:
