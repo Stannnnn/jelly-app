@@ -85,11 +85,11 @@ Alternatively, you can run the development server directly: `yarn dev` or `yarn 
 
 ### 🚀 Docker Deployment
 
-You can now deploy **Jelly Music App** using Docker, with the ability to set a default or locked Jellyfin server URL using a `.env` file—ideal for simplified self-hosting.
+You can now deploy **Jelly Music App** using Docker, with the ability to set a default or locked Jellyfin server URL using a `.env` file, ideal for simplified self-hosting.
 
 ---
 
-## 🔧 Using Docker Compose (Recommended)
+#### 🔧 Using Docker Compose (Recommended)
 
 The Jelly Music App image is available at:
 
@@ -112,7 +112,7 @@ services:
       - VITE_LOCK_JELLYFIN_URL=${VITE_LOCK_JELLYFIN_URL}
 ```
 
-### ➕ `.env` Example
+#### ➕ `.env` Example
 
 Create a `.env` file in the same directory:
 
@@ -123,7 +123,7 @@ VITE_LOCK_JELLYFIN_URL=true
 
 > 💡 Example files are available in the `docker/` folder.
 
-### 🔍 Environment Variable Descriptions
+#### 🔍 Environment Variable Descriptions
 
 - **`VITE_DEFAULT_JELLYFIN_URL`**: Sets the default Jellyfin server URL loaded when the app is accessed, if no URL is already stored in Local Storage.
 - **`VITE_LOCK_JELLYFIN_URL`**: If `true`, disables the URL input field and forces all users to connect to the default URL (ideal for single-server self-hosted setups).
@@ -140,7 +140,7 @@ docker build . --tag jelly-app:latest
 
 ---
 
-## ▶️ Running the Container Directly
+#### ▶️ Running the Container Directly
 
 To run the container manually (without Compose):
 
