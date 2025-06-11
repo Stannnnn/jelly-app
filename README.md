@@ -130,7 +130,7 @@ VITE_LOCK_JELLYFIN_URL=true
 
 ---
 
-## 🐳 Building the Image Manually (Optional)
+#### 🐳 Building the Image Manually (Optional)
 
 To build the Docker image yourself:
 
