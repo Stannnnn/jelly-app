@@ -31,8 +31,6 @@ jobs:
           docker buildx create --use
           docker buildx build \
             --platform linux/amd64,linux/arm64 \
-            --build-arg VITE_DEFAULT_JELLYFIN_URL=https://media.poveycloud.top \
-            --build-arg VITE_LOCK_JELLYFIN_URL=true \
             -t ghcr.io/${{ github.repository_owner }}/jelly-app:latest \
             -t ghcr.io/${{ github.repository_owner }}/jelly-app:${{ env.VERSION }} \
             --push .
