@@ -2,8 +2,6 @@ name: Publish Docker Image to GHCR
 
 on:
   push:
-    branches:
-      - main
     tags:
       - 'v*'  # Runs when you push a tag like v1.0.0
   workflow_dispatch:
