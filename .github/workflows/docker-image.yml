@@ -1,0 +1,34 @@
+name: Publish Docker Image to GHCR
+
+on:
+  push:
+    tags:
+      - 'v*'  # Runs when you push a tag like v1.0.0
+  workflow_dispatch:
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        run: echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Extract version tag
+        id: version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+
+      - name: Build and Push Docker Image (Multi-Platform)
+        run: |
+          docker buildx create --use
+          docker buildx build \
+            --platform linux/amd64,linux/arm64 \
+            -t ghcr.io/${{ github.repository_owner }}/jelly-app:latest \
+            -t ghcr.io/${{ github.repository_owner }}/jelly-app:${{ env.VERSION }} \
+            --push .
