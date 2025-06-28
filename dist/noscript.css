@@ -1,0 +1,217 @@
+a.textlink {
+    color: var(--link-color);
+    outline: none;
+    text-decoration: none;
+}
+
+a.textlink:hover {
+    text-decoration: underline;
+}
+
+:root {
+    --system-fonts: -apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    --inter-font: 'Inter', sans-serif;
+    color-scheme: light;
+    --bg-color-secondary: #f8f8f8;
+    --font-color: #303030;
+    --font-color-tertiary: #767676;
+    --border-color: #ececec;
+    --link-color: #a386e7;
+}
+
+html,
+body {
+    font-family: var(--system-fonts);
+    font-family: var(--inter-font);
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-size: 16px;
+    color: var(--font-color);
+    text-rendering: optimizeLegibility;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--bg-color-secondary);
+}
+
+body {
+    overflow: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+}
+
+#root {
+    height: 100%;
+}
+
+.drawback_interface {
+    position: relative;
+    height: 100%;
+    max-width: 1020px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    gap: 100px;
+}
+
+.drawback_interface > .container {
+    display: flex;
+    align-items: center;
+    gap: 60px;
+}
+
+.drawback_interface > .container > .drawback {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    width: 100%;
+    max-width: 360px;
+    flex-shrink: 0;
+}
+
+.drawback_interface > .container > .drawback > .drawback_header {
+    padding: 60px;
+    margin-bottom: 40px;
+}
+
+.drawback_interface > .container > .drawback > .drawback_header > .container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.drawback_interface > .container > .drawback > .drawback_header > .container > .logo {
+    position: relative;
+}
+
+.drawback_interface > .container > .drawback > .drawback_header > .container > .logo > .image {
+    display: block;
+    width: 80px;
+    height: 80px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-image: url(./logo.webp);
+}
+
+.drawback_interface > .container > .drawback > .drawback_content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 80px;
+}
+
+.drawback_interface > .container > .drawback > .drawback_content > .greeting {
+    margin-bottom: 20px;
+}
+
+.drawback_interface > .container > .drawback > .drawback_content > .greeting > .title {
+    font-size: 1.75rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-align: center;
+}
+
+.drawback_interface > .container > .drawback > .drawback_content > .description {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1.8;
+}
+
+.drawback_interface > .container > .drawback > .drawback_content > .description > blockquote {
+    margin: 0;
+}
+
+.drawback_interface > .container > .drawback > .drawback_content > .description > blockquote > p {
+    font-size: 0.9rem;
+    font-weight: 500;
+    font-style: italic;
+    text-indent: -16px;
+    margin: 10px 20px;
+}
+
+.drawback_interface > .container > .drawback > .drawback_content > .description > blockquote > p::before {
+    content: '\201C';
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: normal;
+    margin-right: 4px;
+}
+
+.drawback_interface > .container > .drawback > .drawback_content > .description > blockquote > p::after {
+    content: '\201D';
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: normal;
+}
+
+.drawback_interface > .container > .drawback > .drawback_content > .description > .conclusion {
+    font-size: 0.725rem;
+    color: var(--font-color-tertiary);
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border-color);
+}
+
+.drawback_interface > .container > .drawback > .drawback_content > .description > .conclusion > p {
+    margin: 0;
+    margin-top: 10px;
+    margin-left: 10px;
+}
+
+.drawback_interface > .container > .preview {
+    position: relative;
+    display: block;
+    width: calc(100% - 100px);
+    height: calc(100% - 100px);
+}
+
+.drawback_interface > .container > .preview > .thumbnail {
+    max-width: 100%;
+    max-height: 100%;
+    border-radius: 2.6%;
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.14);
+}
+
+.drawback_interface > .disclaimer {
+    margin-top: auto;
+    padding: 12px 20px;
+    font-size: 0.725rem;
+    font-weight: 300;
+    color: var(--font-color-tertiary);
+    text-align: center;
+}
+
+/* Responsive */
+@media only screen and (max-width: 980px) {
+    .drawback_interface {
+        max-width: calc(100% - 40px);
+    }
+
+    .drawback_interface > .container {
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .drawback_interface > .container > .drawback > .drawback_header {
+        padding: 40px;
+    }
+}
+
+@media only screen and (max-width: 480px) {
+    .drawback_interface {
+        max-width: calc(100% - 20px);
+    }
+
+    .drawback_interface > .container > .preview {
+        width: 100%;
+    }
+}
