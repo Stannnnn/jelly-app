@@ -77,7 +77,7 @@ const RoutedApp = () => {
 
     const handleLogout = async () => {
         setIsLoggingOut(true)
-        localStorage.removeItem('repeatMode')
+        localStorage.removeItem('playback.state.repeat')
         setAuth(null)
         localStorage.removeItem('auth')
         setIsLoggingOut(false)

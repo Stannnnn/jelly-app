@@ -1,14 +1,12 @@
-import { ReactNode, useEffect, useState } from 'react'
+import { ReactNode, useCallback, useEffect } from 'react'
 import { ThemeContext } from './ThemeContext'
+import { useConfig } from '../../hooks/useConfig'
 
 type Theme = 'light' | 'dark' | 'system'
 export type IThemeContext = ReturnType<typeof useInitialState>
 
 const useInitialState = () => {
-    const [theme, setTheme] = useState<Theme>(() => {
-        const savedTheme = localStorage.getItem('theme') as Theme
-        return savedTheme || 'light'
-    })
+    const [theme, setTheme] = useConfig<Theme>('appearance.theme', 'light')
 
     useEffect(() => {
         const html = document.documentElement
@@ -43,20 +41,25 @@ const useInitialState = () => {
         return () => systemDarkQuery.removeEventListener('change', handleSystemChange)
     }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-    const toggleTheme = (newTheme: Theme) => {
-        setTheme(newTheme)
-        const html = document.documentElement
-        setTimeout(() => {
-            html.classList.remove('light', 'dark')
-            if (newTheme === 'system') {
-                const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-                html.classList.add(isDark ? 'dark' : 'light')
-            } else {
-                html.classList.add(newTheme)
-            }
-            localStorage.setItem('theme', newTheme)
-        }, 200) // Delayed class switch
-    }
+    const toggleTheme = useCallback(
+        (newTheme: Theme) => {
+            setTheme(newTheme)
+            const html = document.documentElement
+            setTimeout(() => {
+                html.classList.remove('light', 'dark')
+                if (newTheme === 'system') {
+                    const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+                    html.classList.add(isDark ? 'dark' : 'light')
+                } else {
+                    html.classList.add(newTheme)
+                }
+                setTheme(newTheme)
+            }, 200) // Delayed class switch
+        },
+        [setTheme]
+    )
+
+    useEffect(() => toggleTheme(theme), [theme, toggleTheme])
 
     return { theme, toggleTheme }
 }
