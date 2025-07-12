@@ -1,7 +1,7 @@
 import { FormEvent, useEffect, useState } from 'react'
 import { ApiError, loginToJellyfin } from '../api/jellyfin'
-import { useExternalConfig } from '../hooks/useExternalConfig'
 import { Loader } from './Loader'
+import { useConfig } from '../hooks/useConfig'
 
 export const AuthForm = ({
     onLogin,
@@ -12,21 +12,36 @@ export const AuthForm = ({
     const isDemo = queryParams.get('demo') === '1'
 
     // If the URL is locked, we just use the default
-    const loadedURL = isDemo ? 'https://demo.jellyfin.org/stable' : localStorage.getItem('lastServerUrl') || ''
-    const [serverUrl, setServerUrl] = useState(loadedURL)
+    const [serverUrl, setServerUrl] = useConfig<string>(
+        'server.url',
+        isDemo ? 'https://demo.jellyfin.org/stable' : '',
+        {
+            external: {
+                key: 'DEFAULT_JELLYFIN_URL',
+                parse(v) {
+                    if (typeof v === 'string') return v
+                    return undefined
+                },
+            },
+            // Will manually manage localStorage
+            persistent: false,
+        }
+    )
+    const [lockUrl, _, lockLoading] = useConfig('server.lockurl', false, {
+        external: {
+            key: 'LOCK_JELLYFIN_URL',
+            parse(v) {
+                return v === true || v === 'true'
+            },
+        },
+        // Should not be stored
+        persistent: false,
+    })
 
-    const { data: config, isPending: loadingConfiguration } = useExternalConfig()
     const [username, setUsername] = useState(isDemo ? 'demo' : '')
     const [password, setPassword] = useState('')
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
-
-    useEffect(() => {
-        if (!config) return
-
-        if (config.lockJellyfinUrl) setServerUrl(config.defaultJellyfinUrl || '')
-        else if (!serverUrl) setServerUrl(config.defaultJellyfinUrl || '')
-    }, [serverUrl, loadingConfiguration, config])
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault()
@@ -69,7 +84,7 @@ export const AuthForm = ({
             const { token, userId, username: fetchedUsername } = result!
 
             // Save the serverUrl to localStorage on successful login
-            localStorage.setItem('lastServerUrl', trimmedServerUrl)
+            localStorage.setItem('server.url', trimmedServerUrl)
             onLogin({ serverUrl: trimmedServerUrl, token, userId, username: fetchedUsername })
         } catch (err) {
             if (err instanceof ApiError) {
@@ -96,13 +111,13 @@ export const AuthForm = ({
         }
     }
 
-    return loadingConfiguration ? (
+    return lockLoading ? (
         <Loader></Loader>
     ) : (
         <form className="login_form" onSubmit={handleSubmit}>
             <div className="error_placeholder">{error && <div className="error">{error}</div>}</div>
             <div className="title">Welcome back</div>
-            {!config?.lockJellyfinUrl && ( // We do not render if the URL is locked
+            {!lockUrl && ( // We do not render if the URL is locked
                 <div className="input_container">
                     <input
                         type="text"

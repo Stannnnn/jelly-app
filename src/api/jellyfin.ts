@@ -23,10 +23,10 @@ export class ApiError extends Error {
 }
 
 const generateDeviceId = () => {
-    const storedDeviceId = localStorage.getItem('deviceId')
+    const storedDeviceId = localStorage.getItem('device.id')
     if (storedDeviceId) return storedDeviceId
     const newDeviceId = Math.random().toString(36).substring(2) + Date.now().toString(36)
-    localStorage.setItem('deviceId', newDeviceId)
+    localStorage.setItem('device.id', newDeviceId)
     return newDeviceId
 }
 

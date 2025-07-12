@@ -8,8 +8,7 @@ import { useAudioStorageContext } from '../AudioStorageContext/AudioStorageConte
 import { useJellyfinContext } from '../JellyfinContext/JellyfinContext'
 import { usePlaybackContext } from '../PlaybackContext/PlaybackContext'
 import { DownloadContext } from './DownloadContext'
-
-const STORAGE_KEY = 'mediaTaskQueue'
+import { useConfig } from '../../hooks/useConfig'
 
 type Task = { mediaItem: MediaItem; action: 'download' | 'remove'; containerId?: string }
 
@@ -44,27 +43,10 @@ const useInitialState = () => {
         refreshStorageStats()
     }, [refreshStorageStats])
 
-    const [queue, setQueue] = useState<Task[]>(() => {
-        try {
-            const stored = localStorage.getItem(STORAGE_KEY)
-            return stored ? (JSON.parse(stored) as Task[]) : []
-        } catch (e) {
-            console.error('Failed to load media task queue:', e)
-            return []
-        }
-    })
+    const [queue, setQueue] = useConfig<Task[]>('playback.media.queue', [], { sync: false })
 
     const processingRef = useRef(false)
     const abortControllerRef = useRef<AbortController | null>(null)
-
-    // Persist queue
-    useEffect(() => {
-        try {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(queue))
-        } catch (e) {
-            console.error('Failed to save media task queue:', e)
-        }
-    }, [queue])
 
     // Enqueue download
     const addToDownloads = (items: MediaItem[], container: MediaItem | undefined) => {
@@ -135,7 +117,7 @@ const useInitialState = () => {
         })
 
         setQueue([])
-    }, [queue, patchMediaItem])
+    }, [queue, setQueue, patchMediaItem])
 
     // Process queue tasks one at a time
     useEffect(() => {
@@ -222,7 +204,7 @@ const useInitialState = () => {
         }
 
         runNext()
-    }, [api, audioStorage, refreshStorageStats, patchMediaItem, playback, queryClient, queue])
+    }, [api, audioStorage, refreshStorageStats, patchMediaItem, playback, queryClient, queue, setQueue])
 
     // We need the addToDownloads in jellyfin API but we don't want to cause unnecessary re-renders
     window.addToDownloads = addToDownloads
