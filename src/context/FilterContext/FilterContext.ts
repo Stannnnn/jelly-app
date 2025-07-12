@@ -60,10 +60,10 @@ export type FilterState = {
 }
 
 export const getSavedFilter = (path: string) => {
-    const rememberFilters = localStorage.getItem('rememberFilters') === 'on'
+    const rememberFilters = localStorage.getItem('ui.remember-filters') === 'on'
     if (!rememberFilters) return
 
-    const saved = localStorage.getItem(`rememberFilters_${path}`)
+    const saved = localStorage.getItem(`ui.remember-filters.${path}`)
     if (!saved) return
 
     try {

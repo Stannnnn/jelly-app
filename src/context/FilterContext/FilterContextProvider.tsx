@@ -61,7 +61,7 @@ const useInitialState = () => {
 
             if (playback.rememberFilters) {
                 localStorage.setItem(
-                    `rememberFilters_${getSavedFilterPath(location.pathname)}`,
+                    `ui.remember-filters.${getSavedFilterPath(location.pathname)}`,
                     JSON.stringify(newState)
                 )
             }

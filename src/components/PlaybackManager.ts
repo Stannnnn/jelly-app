@@ -7,6 +7,7 @@ import { useAudioStorageContext } from '../context/AudioStorageContext/AudioStor
 import { useJellyfinContext } from '../context/JellyfinContext/JellyfinContext'
 import { IJellyfinInfiniteProps, useJellyfinInfiniteData } from '../hooks/Jellyfin/Infinite/useJellyfinInfiniteData'
 import { isMediaItem } from '../hooks/usePatchQueries'
+import { useConfig } from '../hooks/useConfig'
 
 export type IReviver = {
     queryKey: unknown[]
@@ -23,56 +24,25 @@ export type PlaybackManagerProps = {
 export const usePlaybackManager = ({ initialVolume, clearOnLogout }: PlaybackManagerProps) => {
     const api = useJellyfinContext()
     // Session based play count for settings page
-    const [sessionPlayCount, setSessionPlayCount] = useState(() => {
-        const saved = localStorage.getItem('sessionPlayCount')
-        return saved ? Number(saved) : 0
-    })
+    const [sessionPlayCount, setSessionPlayCount] = useConfig('playback.state.sessionplaycount', 0)
 
     // Lyrics
-    const [lyricsTimestamps, setLyricsTimestamps] = useState(localStorage.getItem('lyricsTimestamps') === 'on')
-    useEffect(() => localStorage.setItem('lyricsTimestamps', lyricsTimestamps ? 'on' : 'off'), [lyricsTimestamps])
-
-    const [centeredLyrics, setCenteredLyrics] = useState(localStorage.getItem('centeredLyrics') === 'on')
-    useEffect(() => localStorage.setItem('centeredLyrics', centeredLyrics ? 'on' : 'off'), [centeredLyrics])
+    const [lyricsTimestamps, setLyricsTimestamps] = useConfig('lyrics.timestamps', false)
+    const [centeredLyrics, setCenteredLyrics] = useConfig('lyrics.centered', false)
 
     // UI Settings
-    const [rememberFilters, setRememberFilters] = useState(localStorage.getItem('rememberFilters') === 'on')
-    useEffect(() => localStorage.setItem('rememberFilters', rememberFilters ? 'on' : 'off'), [rememberFilters])
+    const [rememberFilters, setRememberFilters] = useConfig('ui.remember-filters', true)
 
-    const [currentTrackIndex, setCurrentTrackIndex] = useState({
-        index: localStorage.getItem('currentTrackIndex') ? Number(localStorage.getItem('currentTrackIndex')) : -1,
-    })
+    const [currentTrackIndex, setCurrentTrackIndex] = useConfig('playback.state.trackindex', -1, { sync: false })
     const [isPlaying, setIsPlaying] = useState(false)
 
-    const [volume, setVolume] = useState(() => {
-        const savedVolume = localStorage.getItem('volume')
-        return savedVolume ? parseFloat(savedVolume) : initialVolume
-    })
-
-    const [shuffle, setShuffle] = useState(localStorage.getItem('shuffle') === 'true')
-    const [repeat, setRepeat] = useState<'off' | 'all' | 'one'>(() => {
-        const savedRepeat = localStorage.getItem('repeatMode')
-        return savedRepeat === 'all' || savedRepeat === 'one' ? savedRepeat : 'off'
-    })
+    const [volume, setVolume] = useConfig('playback.state.volume', initialVolume, { sync: false })
+    const [shuffle, setShuffle] = useConfig('playback.state.shuffle', false, { sync: false })
+    const [repeat, setRepeat] = useConfig<'off' | 'all' | 'one'>('playback.state.repeat', 'off', { sync: false })
 
     const crossfade = useRef<'A' | 'B'>('A')
-    const [isCrossfadeActive, setIsCrossfadeActive] = useState(localStorage.getItem('crossfade') === 'true')
-    const [crossfadeDuration, setCrossfadeDuration] = useState(() => {
-        const savedDuration = localStorage.getItem('crossfadeDuration')
-        return savedDuration ? Number(savedDuration) : 1
-    })
-
-    useEffect(() => {
-        localStorage.setItem('crossfade', isCrossfadeActive.toString())
-    }, [isCrossfadeActive])
-
-    useEffect(() => {
-        localStorage.setItem('crossfadeDuration', crossfadeDuration.toString())
-    }, [crossfadeDuration])
-
-    useEffect(() => {
-        localStorage.setItem('shuffle', shuffle.toString())
-    }, [shuffle])
+    const [isCrossfadeActive, setIsCrossfadeActive] = useConfig('playback.crossfade.active', false)
+    const [crossfadeDuration, setCrossfadeDuration] = useConfig('playback.crossfade.duration', 1)
 
     const audioA = useRef(new Audio())
     const audioB = useRef(new Audio())
@@ -88,19 +58,16 @@ export const usePlaybackManager = ({ initialVolume, clearOnLogout }: PlaybackMan
     const hasRestored = useRef(false)
     const queryClient = useQueryClient()
 
-    const [playlistTitle, setPlaylistTitle] = useState(localStorage.getItem('playlistTitle') || '')
-    const [reviver, setReviver] = useState<IReviver>(JSON.parse(localStorage.getItem('reviver') || '{}') || {})
+    const [playlistTitle, setPlaylistTitle] = useConfig('playback.state.title', '')
+    const [reviver, setReviver] = useConfig<IReviver>('playback.state.reviver', { queryKey: [] })
 
-    const [bitrate, setBitrate] = useState(Number(localStorage.getItem('bitrate')))
+    const [bitrate, setBitrate] = useConfig('playback.bitrate', 0)
+
     const needsReloadRef = useRef(false)
 
     const audioStorage = useAudioStorageContext()
 
     const tmpShuffleTrackRef = useRef<MediaItem | undefined>(undefined)
-
-    useEffect(() => {
-        localStorage.setItem('bitrate', bitrate.toString())
-    }, [bitrate])
 
     // Shuffle is normally handled by passing 'random' to queryFn but when this is not an infinite query we have to manually handle it
     const isManualShuffle = useMemo(() => {
@@ -131,7 +98,7 @@ export const usePlaybackManager = ({ initialVolume, clearOnLogout }: PlaybackMan
                     const response: MediaItem[] = (await (api as any)[queryFn]?.(...params)) || []
 
                     if (shuffle && !isManualShuffle && tmpShuffleTrackRef.current) {
-                        response.splice(currentTrackIndex.index, 0, tmpShuffleTrackRef.current)
+                        response.splice(currentTrackIndex, 0, tmpShuffleTrackRef.current)
                     }
 
                     tmpShuffleTrackRef.current = undefined
@@ -151,7 +118,7 @@ export const usePlaybackManager = ({ initialVolume, clearOnLogout }: PlaybackMan
         } satisfies IJellyfinInfiniteProps
     }, [
         api,
-        currentTrackIndex.index,
+        currentTrackIndex,
         isManualShuffle,
         reviver.queryFn?.fn,
         reviver.queryFn?.params,
@@ -178,14 +145,14 @@ export const usePlaybackManager = ({ initialVolume, clearOnLogout }: PlaybackMan
         const itemsWithIds = _items.map(addQueueId)
 
         if (isManualShuffle && itemsWithIds.length) {
-            const playedEnd = currentTrackIndex.index + 1
+            const playedEnd = currentTrackIndex + 1
             const played = itemsWithIds.slice(0, playedEnd)
             const future = itemsWithIds.slice(playedEnd).sort(() => Math.random() - 0.5)
             return [...played, ...future]
         }
 
         return itemsWithIds
-        // We ignore 'currentTrackIndex.index' here because we only want to shuffle once, not on every render.
+        // We ignore 'currentTrackIndex' here because we only want to shuffle once, not on every render.
     }, [_items, addQueueId, isManualShuffle]) // eslint-disable-line react-hooks/exhaustive-deps
 
     const _pages = useMemo(() => {
@@ -233,18 +200,16 @@ export const usePlaybackManager = ({ initialVolume, clearOnLogout }: PlaybackMan
 
                 queryClient.setQueryData(queryKey, props.pages)
 
-                localStorage.setItem('reviver', JSON.stringify(props.reviver || {}))
                 setReviver(props.reviver || ({} as IReviver))
 
                 setShuffle(false)
             }
 
-            localStorage.setItem('playlistTitle', props.title)
             setPlaylistTitle(props.title)
 
             tmpShuffleTrackRef.current = undefined
         },
-        [queryClient]
+        [queryClient, setPlaylistTitle, setReviver, setShuffle]
     )
 
     const setCurrentPlaylistSimple = useCallback(
@@ -284,8 +249,8 @@ export const usePlaybackManager = ({ initialVolume, clearOnLogout }: PlaybackMan
     const [userInteracted, setUserInteracted] = useState(false)
 
     const currentTrack = useMemo<MediaItem | undefined>(() => {
-        return tmpShuffleTrackRef.current || items[currentTrackIndex.index] || undefined
-    }, [currentTrackIndex.index, items])
+        return tmpShuffleTrackRef.current || items[currentTrackIndex] || undefined
+    }, [currentTrackIndex, items])
 
     useEffect(() => {
         if (isManualShuffle) {
@@ -350,16 +315,14 @@ export const usePlaybackManager = ({ initialVolume, clearOnLogout }: PlaybackMan
     useEffect(() => {
         if (clearOnLogout || !api.auth.token) {
             setSessionPlayCount(0)
-            localStorage.removeItem('sessionPlayCount')
         } else if (api.auth.token) {
-            localStorage.setItem('sessionPlayCount', sessionPlayCount.toString())
+            setSessionPlayCount(sessionPlayCount)
         }
-    }, [api.auth.token, clearOnLogout, sessionPlayCount])
+    }, [api.auth.token, clearOnLogout, sessionPlayCount, setSessionPlayCount])
 
     // Force session play count to reset
     const resetSessionCount = () => {
         setSessionPlayCount(0)
-        localStorage.removeItem('sessionPlayCount')
     }
 
     const handleHls = useCallback(
@@ -532,7 +495,16 @@ export const usePlaybackManager = ({ initialVolume, clearOnLogout }: PlaybackMan
                 console.error('Error playing track:', error)
             }
         }
-    }, [api, audioRef, currentTrack, isPlaying, setAudioSourceAndLoad, updateMediaSessionMetadata, userInteracted])
+    }, [
+        api,
+        audioRef,
+        currentTrack,
+        isPlaying,
+        setAudioSourceAndLoad,
+        setSessionPlayCount,
+        updateMediaSessionMetadata,
+        userInteracted,
+    ])
 
     const togglePlayPause = useCallback(async () => {
         setUserInteracted(true)
@@ -579,7 +551,7 @@ export const usePlaybackManager = ({ initialVolume, clearOnLogout }: PlaybackMan
     ])
 
     useEffect(() => {
-        if (currentTrackIndex.index >= 0 && currentTrackIndex.index < items.length && items[currentTrackIndex.index]) {
+        if (currentTrackIndex >= 0 && currentTrackIndex < items.length && items[currentTrackIndex]) {
             playTrack()
         } else {
             if (audioRef.current) {
@@ -589,17 +561,17 @@ export const usePlaybackManager = ({ initialVolume, clearOnLogout }: PlaybackMan
     }, [currentTrack?.Id]) // eslint-disable-line react-hooks/exhaustive-deps
 
     const hasNextTrack = useCallback(() => {
-        if (!items || items.length === 0 || currentTrackIndex.index === -1) {
+        if (!items || items.length === 0 || currentTrackIndex === -1) {
             return false
         }
 
-        return currentTrackIndex.index + 1 < items.length
-    }, [currentTrackIndex.index, items])
+        return currentTrackIndex + 1 < items.length
+    }, [currentTrackIndex, items])
 
     const nextTrack = useCallback(async () => {
         setUserInteracted(true)
 
-        if (!items || items.length === 0 || currentTrackIndex.index === -1 || !currentTrack) {
+        if (!items || items.length === 0 || currentTrackIndex === -1 || !currentTrack) {
             if (audioRef.current) {
                 audioRef.current.pause()
             }
@@ -610,13 +582,13 @@ export const usePlaybackManager = ({ initialVolume, clearOnLogout }: PlaybackMan
         if (repeat === 'one') {
             playTrack()
         } else {
-            const nextIndex = currentTrackIndex.index + 1
+            const nextIndex = currentTrackIndex + 1
             if (nextIndex >= items.length) {
                 if (await loadMore()) {
-                    setCurrentTrackIndex({ index: nextIndex })
+                    setCurrentTrackIndex(nextIndex)
                 } else {
                     if (repeat === 'all') {
-                        setCurrentTrackIndex({ index: 0 })
+                        setCurrentTrackIndex(0)
                     } else {
                         if (audioRef.current) {
                             audioRef.current.pause()
@@ -626,15 +598,15 @@ export const usePlaybackManager = ({ initialVolume, clearOnLogout }: PlaybackMan
                     }
                 }
             } else {
-                setCurrentTrackIndex({ index: nextIndex })
+                setCurrentTrackIndex(nextIndex)
             }
         }
-    }, [audioRef, currentTrack, currentTrackIndex.index, items, loadMore, playTrack, repeat])
+    }, [audioRef, currentTrack, currentTrackIndex, items, loadMore, playTrack, repeat, setCurrentTrackIndex])
 
     const previousTrack = useCallback(async () => {
         setUserInteracted(true)
 
-        if (!items || items.length === 0 || currentTrackIndex.index === -1 || !currentTrack) {
+        if (!items || items.length === 0 || currentTrackIndex === -1 || !currentTrack) {
             if (audioRef.current) {
                 audioRef.current.pause()
             }
@@ -645,10 +617,10 @@ export const usePlaybackManager = ({ initialVolume, clearOnLogout }: PlaybackMan
         if (repeat === 'one') {
             playTrack()
         } else {
-            const prevIndex = currentTrackIndex.index - 1
+            const prevIndex = currentTrackIndex - 1
             if (prevIndex < 0) {
                 if (repeat === 'all') {
-                    setCurrentTrackIndex({ index: items.length - 1 })
+                    setCurrentTrackIndex(items.length - 1)
                 } else {
                     if (audioRef.current) {
                         audioRef.current.pause()
@@ -657,10 +629,10 @@ export const usePlaybackManager = ({ initialVolume, clearOnLogout }: PlaybackMan
                     return
                 }
             } else {
-                setCurrentTrackIndex({ index: prevIndex })
+                setCurrentTrackIndex(prevIndex)
             }
         }
-    }, [audioRef, currentTrack, currentTrackIndex.index, items, playTrack, repeat])
+    }, [audioRef, currentTrack, currentTrackIndex, items, playTrack, repeat, setCurrentTrackIndex])
 
     const nextTrackCrossfade = useCallback(async () => {
         if (!audioRef.current) return
@@ -709,7 +681,7 @@ export const usePlaybackManager = ({ initialVolume, clearOnLogout }: PlaybackMan
                 ],
             })
         }
-    }, [currentTrack, isManualShuffle, queryClient, reviver.queryKey, shuffle])
+    }, [currentTrack, isManualShuffle, queryClient, reviver.queryKey, setShuffle, shuffle])
 
     const toggleRepeat = () => {
         setRepeat(prev => {
@@ -791,37 +763,29 @@ export const usePlaybackManager = ({ initialVolume, clearOnLogout }: PlaybackMan
     }, [nextTrack, previousTrack, togglePlayPause])
 
     useEffect(() => {
-        localStorage.setItem('volume', volume.toString())
+        setVolume(volume)
         if (audioRef.current) {
             audioRef.current.volume = volume
         }
-    }, [audioRef, volume])
-
-    useEffect(() => {
-        localStorage.setItem('repeatMode', repeat)
-    }, [repeat])
-
-    useEffect(() => {
-        localStorage.setItem('currentTrackIndex', currentTrackIndex.index.toString())
-    }, [currentTrackIndex])
+    }, [audioRef, setVolume, volume])
 
     useEffect(() => {
         if (hasRestored.current) return
         hasRestored.current = true
 
         const restoreAudio = async () => {
-            const savedIndex = localStorage.getItem('currentTrackIndex')
+            const savedIndex = currentTrackIndex
             if (api.auth.token) {
                 const indexInPlaylist = Number(savedIndex)
                 if (indexInPlaylist !== -1) {
-                    setCurrentTrackIndex({ index: currentTrackIndex.index })
+                    setCurrentTrackIndex(currentTrackIndex)
                 } else if (savedIndex) {
-                    setCurrentTrackIndex({ index: Number(savedIndex) })
+                    setCurrentTrackIndex(Number(savedIndex))
                 } else {
-                    setCurrentTrackIndex({ index: -1 })
+                    setCurrentTrackIndex(-1)
                 }
 
-                const lastPlayedTrack = items[currentTrackIndex.index]
+                const lastPlayedTrack = items[currentTrackIndex]
 
                 if (lastPlayedTrack) {
                     if (audioRef.current) {
@@ -830,21 +794,29 @@ export const usePlaybackManager = ({ initialVolume, clearOnLogout }: PlaybackMan
                     updateMediaSessionMetadata(lastPlayedTrack)
                 }
             } else if (!api.auth.token) {
-                setCurrentTrackIndex({ index: -1 })
+                setCurrentTrackIndex(-1)
             }
         }
 
         restoreAudio()
-    }, [api.auth.token, audioRef, currentTrackIndex.index, items, setAudioSourceAndLoad, updateMediaSessionMetadata])
+    }, [
+        api.auth.token,
+        audioRef,
+        currentTrackIndex,
+        items,
+        setAudioSourceAndLoad,
+        setCurrentTrackIndex,
+        updateMediaSessionMetadata,
+    ])
 
     // Preload next page when near end
     useEffect(() => {
         const threshold = 5
 
-        if (hasNextPage && currentTrackIndex.index >= items.length - threshold) {
+        if (hasNextPage && currentTrackIndex >= items.length - threshold) {
             loadMore()
         }
-    }, [currentTrackIndex.index, hasNextPage, items.length, loadMore])
+    }, [currentTrackIndex, hasNextPage, items.length, loadMore])
 
     useEffect(() => {
         if (!audioRef.current) return
@@ -852,7 +824,7 @@ export const usePlaybackManager = ({ initialVolume, clearOnLogout }: PlaybackMan
         const audio = audioRef.current
 
         const handleEnded = async () => {
-            if (!currentTrack || currentTrackIndex.index === -1 || !items || items.length === 0) {
+            if (!currentTrack || currentTrackIndex === -1 || !items || items.length === 0) {
                 if (currentTrack) {
                     api.reportPlaybackStopped(currentTrack.Id, audio.currentTime)
                 }
@@ -874,22 +846,22 @@ export const usePlaybackManager = ({ initialVolume, clearOnLogout }: PlaybackMan
         return () => {
             audio.removeEventListener('ended', handleEnded)
         }
-    }, [api, audioRef, currentTrack, currentTrackIndex.index, items, nextTrack, playTrack, repeat])
+    }, [api, audioRef, currentTrack, currentTrackIndex, items, nextTrack, playTrack, repeat])
 
     useEffect(() => {
         if (clearOnLogout && currentTrack) {
             api.reportPlaybackStopped(currentTrack.Id, audioRef.current.currentTime)
-            setCurrentTrackIndex({ index: -1 })
+            setCurrentTrackIndex(-1)
 
             if (audioRef.current) {
                 audioRef.current.pause()
             }
         }
-    }, [api, audioRef, clearOnLogout, currentTrack])
+    }, [api, audioRef, clearOnLogout, currentTrack, setCurrentTrackIndex])
 
     return {
         currentTrack,
-        currentTrackIndex: currentTrackIndex.index,
+        currentTrackIndex: currentTrackIndex,
         currentTrackLyricsLoading,
         currentTrackLyrics,
         isPlaying,
@@ -903,7 +875,7 @@ export const usePlaybackManager = ({ initialVolume, clearOnLogout }: PlaybackMan
         setVolume,
         playTrack: (index: number) => {
             setUserInteracted(true)
-            setCurrentTrackIndex({ index })
+            setCurrentTrackIndex(index)
         },
         nextTrack,
         previousTrack,
