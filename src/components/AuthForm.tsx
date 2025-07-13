@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useState } from 'react'
+import { FormEvent, useState } from 'react'
 import { ApiError, loginToJellyfin } from '../api/jellyfin'
 import { Loader } from './Loader'
 import { useConfig } from '../hooks/useConfig'
@@ -23,8 +23,6 @@ export const AuthForm = ({
                     return undefined
                 },
             },
-            // Will manually manage localStorage
-            persistent: false,
         }
     )
     const [lockUrl, _, lockLoading] = useConfig('server.lockurl', false, {
@@ -34,8 +32,6 @@ export const AuthForm = ({
                 return v === true || v === 'true'
             },
         },
-        // Should not be stored
-        persistent: false,
     })
 
     const [username, setUsername] = useState(isDemo ? 'demo' : '')
@@ -84,7 +80,7 @@ export const AuthForm = ({
             const { token, userId, username: fetchedUsername } = result!
 
             // Save the serverUrl to localStorage on successful login
-            localStorage.setItem('server.url', trimmedServerUrl)
+            setServerUrl(trimmedServerUrl)
             onLogin({ serverUrl: trimmedServerUrl, token, userId, username: fetchedUsername })
         } catch (err) {
             if (err instanceof ApiError) {

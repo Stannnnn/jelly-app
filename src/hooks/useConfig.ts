@@ -11,9 +11,6 @@ export interface IConfigOptions<T> {
         key: string
         parse: (v: JSONPrimitive) => T | undefined
     }
-    // Whether the configuration is persisted on localStorage
-    // True by default
-    persistent?: false
     // Whether to keep different tabs in sync for this configuration (current window only data, like shuffle/repeat state and current playing music should have this set to false)
     // True by default
     sync?: false
@@ -44,15 +41,14 @@ export const useConfig = <T extends JSONValue>(
 
     // Load from localStorage
     let loadedFromStorage = false
-    if (options?.persistent !== false) {
-        const storedValue = localStorage.getItem(key)
-        if (storedValue !== null) {
-            try {
-                initialValue = JSON.parse(storedValue) as T
-                loadedFromStorage = true
-            } catch {
-                console.warn(`Configuration '${key}' has invalid value '${storedValue}'`)
-            }
+
+    const storedValue = localStorage.getItem(key)
+    if (storedValue !== null) {
+        try {
+            initialValue = JSON.parse(storedValue) as T
+            loadedFromStorage = true
+        } catch {
+            console.warn(`Configuration '${key}' has invalid value '${storedValue}'`)
         }
     }
 
@@ -77,15 +73,13 @@ export const useConfig = <T extends JSONValue>(
 
     // Setup write to localStorage
     useEffect(() => {
-        if (options?.persistent !== false) {
-            const storedValue = localStorage.getItem(key)
+        const storedValue = localStorage.getItem(key)
 
-            if (storedValue === null || JSON.parse(storedValue) !== value) {
-                try {
-                    localStorage.setItem(key, JSON.stringify(value))
-                } catch {
-                    console.warn(`Configuration '${key}' has invalid value '${storedValue}'`)
-                }
+        if (storedValue === null || JSON.parse(storedValue) !== value) {
+            try {
+                localStorage.setItem(key, JSON.stringify(value))
+            } catch {
+                console.warn(`Configuration '${key}' has invalid value '${storedValue}'`)
             }
         }
     }, [def, key, options, value])
