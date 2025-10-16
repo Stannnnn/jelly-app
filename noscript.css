@@ -191,6 +191,12 @@ body {
 }
 
 /* Responsive */
+@media only screen and (pointer: coarse) {
+    .drawback_interface > .disclaimer {
+        padding-bottom: 20px;
+    }
+}
+
 @media only screen and (max-width: 980px) {
     .drawback_interface {
         max-width: calc(100% - 40px);
@@ -212,6 +218,6 @@ body {
     }
 
     .drawback_interface > .container > .preview {
-        width: 100%;
+        width: calc(100% - 20px);
     }
 }
