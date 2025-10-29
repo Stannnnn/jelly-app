@@ -661,7 +661,7 @@ body.lockscroll {
     margin-top: -5px;
     transform: scaleY(0.6);
     transform-origin: bottom;
-    transition: transform 0.16s ease-out;
+    transition: transform 0.14s ease-out;
 }
 
 .main > .main_footer > .playback > .progress:hover,
