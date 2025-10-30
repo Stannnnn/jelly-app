@@ -48,6 +48,7 @@ const useInitialState = () => {
         triggerRect: null,
     })
     const [isTouchDevice, setIsTouchDevice] = useState(false)
+    const [isInteractionBlocked, setIsInteractionBlocked] = useState(false)
     const { setDisabled } = useScrollContext()
     type IMenuItems = { [x in keyof typeof menuItems]?: boolean }
     const [hidden, setHidden] = useState<IMenuItems>()
@@ -110,6 +111,23 @@ const useInitialState = () => {
             clearTimeout(timeoutId)
         }
     }, [isOpen])
+
+    // Block interactions for 400ms after dropdown opens on touch devices to prevent accidental taps
+    useEffect(() => {
+        if (!isOpen || !isTouchDevice) {
+            setIsInteractionBlocked(false)
+            return
+        }
+
+        setIsInteractionBlocked(true)
+        const timeoutId = setTimeout(() => {
+            setIsInteractionBlocked(false)
+        }, 400)
+
+        return () => {
+            clearTimeout(timeoutId)
+        }
+    }, [isOpen, isTouchDevice])
 
     const closeDropdown = useCallback(() => {
         setIsOpen(false)
@@ -1081,7 +1099,7 @@ const useInitialState = () => {
                 }}
                 ref={menuRef}
             >
-                <div className="dropdown-menu">
+                <div className="dropdown-menu" style={isInteractionBlocked ? { pointerEvents: 'none' } : undefined}>
                     {isTouchDevice && context && (
                         <div className="dropdown-header">
                             <div
@@ -1211,6 +1229,7 @@ const useInitialState = () => {
         hidden?.view_artist,
         hidden?.view_artists,
         isCreatingPlaylist,
+        isInteractionBlocked,
         isOpen,
         isRenamingPlaylist,
         isTouchDevice,
