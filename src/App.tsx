@@ -200,6 +200,7 @@ const MainLayout = ({ auth, handleLogout }: { auth: AuthData; handleLogout: () =
     const { maxWidth } = usePlaybackContext()
     const isDropdownOpen = dropdownContext?.isOpen || false
     const isTouchDevice = dropdownContext?.isTouchDevice || false
+    const isInteractionBlocked = dropdownContext?.isInteractionBlocked || false
 
     useEffect(() => {
         const root = document.documentElement
@@ -222,7 +223,7 @@ const MainLayout = ({ auth, handleLogout }: { auth: AuthData; handleLogout: () =
             <Route
                 path="*"
                 element={
-                    <div className="interface">
+                    <div className={`interface` + (isInteractionBlocked ? ' touchBlocked' : '')}>
                         <div
                             className={
                                 showSidenav || (isDropdownOpen && isTouchDevice)

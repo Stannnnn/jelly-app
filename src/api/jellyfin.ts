@@ -979,6 +979,12 @@ export const initJellyfinApi = ({ serverUrl, userId, token }: { serverUrl: strin
         return Math.round(performance.now() - startTime)
     }
 
+    const fetchServerInfo = async () => {
+        const systemApi = new SystemApi(api.configuration)
+        const response = await systemApi.getSystemInfo()
+        return response.data
+    }
+
     const fetchPlayCount = async () => {
         const itemsApi = new ItemsApi(api.configuration)
         const response = await itemsApi.getItems({
@@ -1091,16 +1097,21 @@ export const initJellyfinApi = ({ serverUrl, userId, token }: { serverUrl: strin
 
     const addToPlaylist = async (playlistId: string, itemIds: string[]) => {
         const playlistApi = new PlaylistsApi(api.configuration)
+        const batchSize = 200
 
-        const response = await playlistApi.updatePlaylist(
-            {
-                playlistId,
-                updatePlaylistDto: { Ids: itemIds },
-            },
-            { signal: AbortSignal.timeout(20000) }
-        )
+        for (let i = 0; i < itemIds.length; i += batchSize) {
+            const batch = itemIds.slice(i, i + batchSize)
+            await playlistApi.addItemToPlaylist(
+                {
+                    userId,
+                    playlistId,
+                    ids: batch,
+                },
+                { signal: AbortSignal.timeout(20000) }
+            )
+        }
 
-        return response.data
+        return true
     }
 
     const removeFromPlaylist = async (playlistId: string, itemId: string) => {
@@ -1258,6 +1269,7 @@ export const initJellyfinApi = ({ serverUrl, userId, token }: { serverUrl: strin
         fetchUserInfo,
         fetchClientIp,
         measureLatency,
+        fetchServerInfo,
         fetchPlayCount,
         fetchSongs,
         reportPlaybackStart,

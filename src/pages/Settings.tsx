@@ -21,6 +21,7 @@ export const Settings = ({ onLogout }: { onLogout: () => void }) => {
     const [lastLogin, setLastLogin] = useState<string | null>(null)
     const [clientIp, setClientIp] = useState<string | null>(null)
     const [latency, setLatency] = useState<number | null>(null)
+    const [serverVersion, setServerVersion] = useState<string | null>(null)
     const { sessionPlayCount, resetSessionCount, bitrate, setBitrate } = usePlaybackContext()
     const playback = usePlaybackContext()
     const queryClient = useQueryClient()
@@ -31,10 +32,11 @@ export const Settings = ({ onLogout }: { onLogout: () => void }) => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [user, clientIp, latencyMs] = await Promise.all([
+                const [user, clientIp, latencyMs, serverInfo] = await Promise.all([
                     api.fetchUserInfo(),
                     api.fetchClientIp(),
                     api.measureLatency(),
+                    api.fetchServerInfo(),
                 ])
 
                 if (user.LastLoginDate) {
@@ -57,6 +59,7 @@ export const Settings = ({ onLogout }: { onLogout: () => void }) => {
 
                 setClientIp(clientIp)
                 setLatency(latencyMs)
+                setServerVersion(serverInfo.Version || null)
             } catch (error) {
                 console.error('Error fetching data:', error)
             }
@@ -484,6 +487,7 @@ export const Settings = ({ onLogout }: { onLogout: () => void }) => {
                         {latency !== null && (
                             <span>
                                 <span>with {latency}ms latency</span>
+                                {serverVersion && <> (Jellyfin v{serverVersion})</>}
                             </span>
                         )}
                     </p>

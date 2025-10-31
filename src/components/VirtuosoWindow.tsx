@@ -7,7 +7,7 @@ import { MediaItem } from '../api/jellyfin.ts'
 type IVirtuosoProps = VirtuosoProps<MediaItem | { isPlaceholder: true }, any>
 
 // Global Map to store scroll offsets keyed by history state index
-const scrollOffsets = new Map<number, number>()
+const scrollOffsets = new Map<number, { pathname: string; offset: number }>()
 
 export const VirtuosoWindow = (virtuosoProps: IVirtuosoProps) => {
     const virtuosoRef = useRef<VirtuosoHandle>(null)
@@ -23,7 +23,10 @@ export const VirtuosoWindow = (virtuosoProps: IVirtuosoProps) => {
         const onScroll = () => {
             const idx = history.state?.idx
             if (idx !== undefined) {
-                scrollOffsets.set(idx, window.scrollY - initialOffset)
+                scrollOffsets.set(idx, {
+                    pathname: window.location.pathname,
+                    offset: window.scrollY - initialOffset,
+                })
             }
         }
 
@@ -31,7 +34,8 @@ export const VirtuosoWindow = (virtuosoProps: IVirtuosoProps) => {
         return () => window.removeEventListener('scrollend', onScroll)
     }, [initialOffset])
 
-    const savedOffset = scrollOffsets.get(history.state?.idx)
+    const saved = scrollOffsets.get(history.state?.idx)
+    const savedOffset = saved?.pathname === window.location.pathname ? saved.offset : 0
 
     return (
         <div ref={wrapperRef}>

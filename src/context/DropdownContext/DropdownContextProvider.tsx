@@ -48,6 +48,7 @@ const useInitialState = () => {
         triggerRect: null,
     })
     const [isTouchDevice, setIsTouchDevice] = useState(false)
+    const [isInteractionBlocked, setIsInteractionBlocked] = useState(false)
     const { setDisabled } = useScrollContext()
     type IMenuItems = { [x in keyof typeof menuItems]?: boolean }
     const [hidden, setHidden] = useState<IMenuItems>()
@@ -110,6 +111,23 @@ const useInitialState = () => {
             clearTimeout(timeoutId)
         }
     }, [isOpen])
+
+    // Block interactions for 400ms after dropdown opens on touch devices to prevent accidental taps
+    useEffect(() => {
+        if (!isOpen || !isTouchDevice) {
+            setIsInteractionBlocked(false)
+            return
+        }
+
+        setIsInteractionBlocked(true)
+        const timeoutId = setTimeout(() => {
+            setIsInteractionBlocked(false)
+        }, 400)
+
+        return () => {
+            clearTimeout(timeoutId)
+        }
+    }, [isOpen, isTouchDevice])
 
     const closeDropdown = useCallback(() => {
         setIsOpen(false)
@@ -233,6 +251,7 @@ const useInitialState = () => {
     useEffect(() => {
         const handlePointerDown = (e: PointerEvent) => {
             if (!isOpen) return
+            if (isInteractionBlocked) return
             const path = (e.composedPath?.() as unknown as Node[]) || []
             const clickedInside = path.some(
                 node =>
@@ -250,7 +269,7 @@ const useInitialState = () => {
         return () => {
             document.removeEventListener('pointerdown', handlePointerDown, true)
         }
-    }, [closeDropdown, isOpen])
+    }, [closeDropdown, isInteractionBlocked, isOpen])
 
     const openSubDropdown = useCallback(
         (type: 'view-artists' | 'add-playlist' | 'rename-playlist', e: React.MouseEvent<HTMLDivElement>) => {
@@ -1081,7 +1100,7 @@ const useInitialState = () => {
                 }}
                 ref={menuRef}
             >
-                <div className="dropdown-menu">
+                <div className={`dropdown-menu ${isInteractionBlocked ? 'touchBlocked' : ''}`}>
                     {isTouchDevice && context && (
                         <div className="dropdown-header">
                             <div
@@ -1211,6 +1230,7 @@ const useInitialState = () => {
         hidden?.view_artist,
         hidden?.view_artists,
         isCreatingPlaylist,
+        isInteractionBlocked,
         isOpen,
         isRenamingPlaylist,
         isTouchDevice,
@@ -1294,6 +1314,7 @@ const useInitialState = () => {
         onTouchStart: handleTouchStart,
         onTouchClear: clearTouchTimer,
         dropdownNode,
+        isInteractionBlocked,
     }
 }
 

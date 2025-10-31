@@ -1,6 +1,4 @@
 import { ArrowLeftIcon, HeartFillIcon, HeartIcon } from '@primer/octicons-react'
-import { useEffect } from 'react'
-import { useLocation } from 'react-router-dom'
 import { JellyImg } from '../components/JellyImg'
 import { Progressbar } from '../components/Main'
 import { DownloadIndicators } from '../components/MediaList'
@@ -19,16 +17,10 @@ export const NowPlayingLyrics = () => {
     const { goBack: previousPage } = useHistoryContext()
     const { currentTrack, bitrate } = usePlaybackContext()
 
-    const location = useLocation()
-
     const playback = usePlaybackContext()
     const duration = useDuration()
     const { isOpen, selectedItem, onContextMenu } = useDropdownContext()
     const { addToFavorites, removeFromFavorites } = useFavorites()
-
-    useEffect(() => {
-        window.scrollTo({ top: 0, behavior: 'instant' })
-    }, [location.pathname])
 
     const handleMoreClick = (e: React.MouseEvent<HTMLDivElement>) => {
         if (!currentTrack) {

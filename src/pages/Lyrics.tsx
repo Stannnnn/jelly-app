@@ -1,4 +1,5 @@
 import { RefObject, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useLocation } from 'react-router-dom'
 import { Loader } from '../components/Loader'
 import { usePlaybackContext } from '../context/PlaybackContext/PlaybackContext'
 import './Lyrics.css'
@@ -9,6 +10,8 @@ export const Lyrics = () => {
 
     const [currentTime, setCurrentTime] = useState<number | null>(null)
     const lineRefs = useRef<Array<HTMLDivElement | null>>([])
+
+    const location = useLocation()
 
     const tickToTimeString = (raw: number) => {
         const ms = raw / 10000
@@ -181,7 +184,7 @@ export const Lyrics = () => {
         if (audio?.src) {
             window.scrollTo({ top: 0, behavior: 'auto' })
         }
-    }, [audio?.src])
+    }, [audio?.src, location.pathname])
 
     return (
         <div className={'lyrics-page' + (lyrics ? ' active' : '') + (isSynced ? ' synced noSelect' : '')}>
