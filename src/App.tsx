@@ -200,6 +200,7 @@ const MainLayout = ({ auth, handleLogout }: { auth: AuthData; handleLogout: () =
     const { maxWidth } = usePlaybackContext()
     const isDropdownOpen = dropdownContext?.isOpen || false
     const isTouchDevice = dropdownContext?.isTouchDevice || false
+    const isInteractionBlocked = dropdownContext?.isInteractionBlocked || false
 
     useEffect(() => {
         const root = document.documentElement
@@ -226,7 +227,7 @@ const MainLayout = ({ auth, handleLogout }: { auth: AuthData; handleLogout: () =
                         <div
                             className={
                                 showSidenav || (isDropdownOpen && isTouchDevice)
-                                    ? 'dimmer active noSelect'
+                                    ? `dimmer active noSelect${isInteractionBlocked ? ' touchBlocked' : ''}`
                                     : 'dimmer noSelect'
                             }
                             onClick={showSidenav ? toggleSidenav : dropdownContext?.closeDropdown}

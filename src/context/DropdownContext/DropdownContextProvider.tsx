@@ -1313,6 +1313,7 @@ const useInitialState = () => {
         onTouchStart: handleTouchStart,
         onTouchClear: clearTouchTimer,
         dropdownNode,
+        isInteractionBlocked,
     }
 }
 
