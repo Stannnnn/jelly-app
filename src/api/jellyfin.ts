@@ -1091,16 +1091,21 @@ export const initJellyfinApi = ({ serverUrl, userId, token }: { serverUrl: strin
 
     const addToPlaylist = async (playlistId: string, itemIds: string[]) => {
         const playlistApi = new PlaylistsApi(api.configuration)
+        const batchSize = 200
 
-        const response = await playlistApi.updatePlaylist(
-            {
-                playlistId,
-                updatePlaylistDto: { Ids: itemIds },
-            },
-            { signal: AbortSignal.timeout(20000) }
-        )
+        for (let i = 0; i < itemIds.length; i += batchSize) {
+            const batch = itemIds.slice(i, i + batchSize)
+            await playlistApi.addItemToPlaylist(
+                {
+                    userId,
+                    playlistId,
+                    ids: batch,
+                },
+                { signal: AbortSignal.timeout(20000) }
+            )
+        }
 
-        return response.data
+        return true
     }
 
     const removeFromPlaylist = async (playlistId: string, itemId: string) => {
