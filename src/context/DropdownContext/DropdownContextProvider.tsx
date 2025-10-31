@@ -251,6 +251,7 @@ const useInitialState = () => {
     useEffect(() => {
         const handlePointerDown = (e: PointerEvent) => {
             if (!isOpen) return
+            if (isInteractionBlocked) return
             const path = (e.composedPath?.() as unknown as Node[]) || []
             const clickedInside = path.some(
                 node =>
@@ -268,7 +269,7 @@ const useInitialState = () => {
         return () => {
             document.removeEventListener('pointerdown', handlePointerDown, true)
         }
-    }, [closeDropdown, isOpen])
+    }, [closeDropdown, isInteractionBlocked, isOpen])
 
     const openSubDropdown = useCallback(
         (type: 'view-artists' | 'add-playlist' | 'rename-playlist', e: React.MouseEvent<HTMLDivElement>) => {

@@ -1328,7 +1328,7 @@ body.lockscroll {
         filter: blur(16px);
     }
 
-    .dimmer.touchBlocked {
+    .interface.touchBlocked {
         pointer-events: none;
     }
 }

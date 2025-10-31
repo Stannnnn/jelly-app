@@ -223,11 +223,11 @@ const MainLayout = ({ auth, handleLogout }: { auth: AuthData; handleLogout: () =
             <Route
                 path="*"
                 element={
-                    <div className="interface">
+                    <div className={`interface` + (isInteractionBlocked ? ' touchBlocked' : '')}>
                         <div
                             className={
                                 showSidenav || (isDropdownOpen && isTouchDevice)
-                                    ? `dimmer active noSelect${isInteractionBlocked ? ' touchBlocked' : ''}`
+                                    ? 'dimmer active noSelect'
                                     : 'dimmer noSelect'
                             }
                             onClick={showSidenav ? toggleSidenav : dropdownContext?.closeDropdown}
