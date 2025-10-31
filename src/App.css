@@ -1327,6 +1327,10 @@ body.lockscroll {
     .music-app:has(.dropdown.active) .dimmer.active ~ .sidenav > .sidenav_wrapper {
         filter: blur(16px);
     }
+
+    .dimmer.touchBlocked {
+        pointer-events: none;
+    }
 }
 
 @media only screen and (max-width: 500px) {
