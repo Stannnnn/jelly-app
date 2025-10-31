@@ -979,6 +979,12 @@ export const initJellyfinApi = ({ serverUrl, userId, token }: { serverUrl: strin
         return Math.round(performance.now() - startTime)
     }
 
+    const fetchServerInfo = async () => {
+        const systemApi = new SystemApi(api.configuration)
+        const response = await systemApi.getSystemInfo()
+        return response.data
+    }
+
     const fetchPlayCount = async () => {
         const itemsApi = new ItemsApi(api.configuration)
         const response = await itemsApi.getItems({
@@ -1263,6 +1269,7 @@ export const initJellyfinApi = ({ serverUrl, userId, token }: { serverUrl: strin
         fetchUserInfo,
         fetchClientIp,
         measureLatency,
+        fetchServerInfo,
         fetchPlayCount,
         fetchSongs,
         reportPlaybackStart,
