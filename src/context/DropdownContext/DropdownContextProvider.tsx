@@ -1099,7 +1099,7 @@ const useInitialState = () => {
                 }}
                 ref={menuRef}
             >
-                <div className="dropdown-menu" style={isInteractionBlocked ? { pointerEvents: 'none' } : undefined}>
+                <div className={`dropdown-menu ${isInteractionBlocked ? 'touchBlocked' : ''}`}>
                     {isTouchDevice && context && (
                         <div className="dropdown-header">
                             <div

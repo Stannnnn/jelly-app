@@ -245,6 +245,11 @@
         -webkit-overflow-scrolling: touch;
     }
 
+    .dropdown > .dropdown-menu.touchBlocked {
+        user-select: none;
+        pointer-events: none;
+    }
+
     html.iOS .dropdown > .dropdown-menu {
         padding-left: env(safe-area-inset-left) !important;
         padding-right: env(safe-area-inset-right) !important;
