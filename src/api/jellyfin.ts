@@ -1004,7 +1004,7 @@ export const initJellyfinApi = ({ serverUrl, userId, token }: { serverUrl: strin
             searchTerm: query,
             includeItemTypes: [BaseItemKind.Audio],
             recursive: true,
-            limit: Math.min(10, JELLYFIN_MAX_LIMIT),
+            limit: Math.min(80, JELLYFIN_MAX_LIMIT),
         })
         return await parseItemDtos(response.data.Items)
     }

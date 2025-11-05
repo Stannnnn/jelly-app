@@ -30,7 +30,14 @@ export const SearchResults = () => {
             <div className="search-content">
                 {results.songs.length > 0 && (
                     <div className="section songs">
-                        <TrackList tracks={results.songs} title={`Search results for '${query}'`} />
+                        <TrackList tracks={results.songs.slice(0, 10)} title={`Search results for '${query}'`} />
+                        {results.songs.length > 10 && (
+                            <div className="all-tracks">
+                                <Link to={`/search/${encodeURIComponent(query)}/tracks`} className="textlink">
+                                    View all tracks
+                                </Link>
+                            </div>
+                        )}
                     </div>
                 )}
 

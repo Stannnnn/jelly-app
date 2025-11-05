@@ -6,6 +6,17 @@
     margin-top: -4px;
 }
 
+.search-results-page > .search-content > .section.songs > .all-tracks {
+    font-size: 0.725rem;
+    font-weight: 500;
+    text-align: right;
+    margin-top: 10px;
+}
+
+.search-results-page > .search-content > .section.songs > .all-tracks > a.textlink {
+    color: var(--font-color-tertiary);
+}
+
 .search-results-page > .search-content > .section:last-of-type {
     margin-bottom: 0;
 }
