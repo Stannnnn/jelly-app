@@ -1,5 +1,5 @@
 import { BaseItemKind } from '@jellyfin/sdk/lib/generated-client'
-import { BookmarkFillIcon, GearIcon } from '@primer/octicons-react'
+import { BookmarkFillIcon, GearIcon, HeartFillIcon } from '@primer/octicons-react'
 import { ChangeEvent, useEffect, useRef, useState, WheelEvent } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { MediaItem } from '../api/jellyfin'
@@ -210,9 +210,18 @@ export const Sidenav = (props: { username: string }) => {
                                                     >
                                                         <div className="type song">
                                                             <div className="icon" title="Track">
-                                                                <div className="song-icon">
-                                                                    <TrackIcon width={14} height={14} />
-                                                                </div>
+                                                                {item.UserData?.IsFavorite ? (
+                                                                    <div
+                                                                        className="song-icon favorite-indicator"
+                                                                        title="Favorited"
+                                                                    >
+                                                                        <HeartFillIcon size={13} />
+                                                                    </div>
+                                                                ) : (
+                                                                    <div className="song-icon">
+                                                                        <TrackIcon width={14} height={14} />
+                                                                    </div>
+                                                                )}
                                                                 <div className="play-icon" />
                                                                 <div className="pause-icon" />
                                                                 <div className="play-state-animation">
