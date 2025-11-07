@@ -1,4 +1,3 @@
-import { BookmarkFillIcon, HeartFillIcon } from '@primer/octicons-react'
 import { useEffect } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { Loader } from '../components/Loader'
@@ -93,23 +92,16 @@ export const SearchResults = () => {
                 {results.genres.length > 0 && (
                     <div className="section genres">
                         <div className="title">Genres</div>
-                        <div className="section-list noSelect">
-                            {results.genres.map(genre => (
-                                <Link to={`/genre/${genre.id}`} key={genre.id} className="section-item">
-                                    <div className="icon">
-                                        <BookmarkFillIcon size={16} />
-                                    </div>
-                                    <div className="section-info">
-                                        <div className="name">{genre.name}</div>
-                                    </div>
-                                    {genre.isFavorite && (
-                                        <div className="favorited" title="Favorited">
-                                            <HeartFillIcon size={16} />
-                                        </div>
-                                    )}
-                                </Link>
-                            ))}
-                        </div>
+                        <MediaList
+                            items={results.genres.map(genre => genre._mediaItem)}
+                            infiniteData={{
+                                pageParams: [1],
+                                pages: [results.genres.map(genre => genre._mediaItem)],
+                            }}
+                            isLoading={loading}
+                            type="genre"
+                            title={`Genres for '${query}'`}
+                        />
                     </div>
                 )}
 
