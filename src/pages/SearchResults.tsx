@@ -31,7 +31,7 @@ export const SearchResults = () => {
                     <div className="section songs">
                         <TrackList tracks={results.songs} title={`Search results for '${query}'`} />
                         {results.songs.length >= 10 && (
-                            <div className="all-tracks">
+                            <div className="view-all">
                                 <Link to={`/search/${encodeURIComponent(query)}/tracks`} className="textlink">
                                     View all tracks
                                 </Link>
@@ -55,7 +55,7 @@ export const SearchResults = () => {
                             hidden={{ view_artist: true }}
                         />
                         {results.artists.length >= 10 && (
-                            <div className="all-tracks">
+                            <div className="view-all">
                                 <Link to={`/search/${encodeURIComponent(query)}/artists`} className="textlink">
                                     View all artists
                                 </Link>
@@ -80,7 +80,7 @@ export const SearchResults = () => {
                             hidden={{ view_album: true }}
                         />
                         {results.albums.length >= 10 && (
-                            <div className="all-tracks">
+                            <div className="view-all">
                                 <Link to={`/search/${encodeURIComponent(query)}/albums`} className="textlink">
                                     View all albums
                                 </Link>
@@ -104,7 +104,7 @@ export const SearchResults = () => {
                             // hidden={{ view_album: true }}
                         />
                         {results.playlists.length >= 10 && (
-                            <div className="all-tracks">
+                            <div className="view-all">
                                 <Link to={`/search/${encodeURIComponent(query)}/playlists`} className="textlink">
                                     View all playlists
                                 </Link>
@@ -127,7 +127,7 @@ export const SearchResults = () => {
                             title={`Genres for '${query}'`}
                         />
                         {results.genres.length >= 10 && (
-                            <div className="all-tracks">
+                            <div className="view-all">
                                 <Link to={`/search/${encodeURIComponent(query)}/genres`} className="textlink">
                                     View all genres
                                 </Link>

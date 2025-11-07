@@ -136,12 +136,13 @@ export const initJellyfinApi = ({ serverUrl, userId, token }: { serverUrl: strin
         return await parseItemDtos(response.data.Items)
     }
 
-    const searchArtists = async (searchTerm: string, limit = 20) => {
+    const searchArtists = async (searchTerm: string, limit = 20, startIndex = 0) => {
         const artistsApi = new ArtistsApi(api.configuration)
         const response = await artistsApi.getArtists(
             {
                 userId,
                 searchTerm,
+                startIndex,
                 limit: Math.min(limit, JELLYFIN_MAX_LIMIT),
             },
             { signal: AbortSignal.timeout(20000) }
@@ -149,7 +150,7 @@ export const initJellyfinApi = ({ serverUrl, userId, token }: { serverUrl: strin
         return await parseItemDtos(response.data.Items)
     }
 
-    const searchAlbumsDetailed = async (searchTerm: string, limit = 50) => {
+    const searchAlbumsDetailed = async (searchTerm: string, limit = 50, startIndex = 0) => {
         const itemsApi = new ItemsApi(api.configuration)
         const response = await itemsApi.getItems(
             {
@@ -157,6 +158,7 @@ export const initJellyfinApi = ({ serverUrl, userId, token }: { serverUrl: strin
                 searchTerm,
                 includeItemTypes: [BaseItemKind.MusicAlbum],
                 recursive: true,
+                startIndex,
                 limit: Math.min(limit, JELLYFIN_MAX_LIMIT),
             },
             { signal: AbortSignal.timeout(20000) }
@@ -164,7 +166,7 @@ export const initJellyfinApi = ({ serverUrl, userId, token }: { serverUrl: strin
         return await parseItemDtos(response.data.Items)
     }
 
-    const searchPlaylistsDetailed = async (searchTerm: string, limit = 50) => {
+    const searchPlaylistsDetailed = async (searchTerm: string, limit = 50, startIndex = 0) => {
         const itemsApi = new ItemsApi(api.configuration)
         const response = await itemsApi.getItems(
             {
@@ -172,6 +174,7 @@ export const initJellyfinApi = ({ serverUrl, userId, token }: { serverUrl: strin
                 searchTerm,
                 includeItemTypes: [BaseItemKind.Playlist],
                 recursive: true,
+                startIndex,
                 limit: Math.min(limit, JELLYFIN_MAX_LIMIT),
             },
             { signal: AbortSignal.timeout(20000) }
@@ -179,13 +182,14 @@ export const initJellyfinApi = ({ serverUrl, userId, token }: { serverUrl: strin
         return await parseItemDtos(response.data.Items)
     }
 
-    const searchGenres = async (searchTerm: string, limit = 20) => {
+    const searchGenres = async (searchTerm: string, limit = 20, startIndex = 0) => {
         const genresApi = new MusicGenresApi(api.configuration)
         const response = await genresApi.getMusicGenres(
             {
                 userId,
                 searchTerm,
                 includeItemTypes: [BaseItemKind.Audio],
+                startIndex,
                 limit: Math.min(limit, JELLYFIN_MAX_LIMIT),
             },
             { signal: AbortSignal.timeout(20000) }
@@ -997,13 +1001,14 @@ export const initJellyfinApi = ({ serverUrl, userId, token }: { serverUrl: strin
         return response.data.TotalRecordCount || null
     }
 
-    const fetchSongs = async (query: string, limit = 80) => {
+    const fetchSongs = async (query: string, limit = 80, startIndex = 0) => {
         const itemsApi = new ItemsApi(api.configuration)
         const response = await itemsApi.getItems({
             userId,
             searchTerm: query,
             includeItemTypes: [BaseItemKind.Audio],
             recursive: true,
+            startIndex,
             limit: Math.min(limit, JELLYFIN_MAX_LIMIT),
         })
         return await parseItemDtos(response.data.Items)
