@@ -997,14 +997,14 @@ export const initJellyfinApi = ({ serverUrl, userId, token }: { serverUrl: strin
         return response.data.TotalRecordCount || null
     }
 
-    const fetchSongs = async (query: string) => {
+    const fetchSongs = async (query: string, limit = 80) => {
         const itemsApi = new ItemsApi(api.configuration)
         const response = await itemsApi.getItems({
             userId,
             searchTerm: query,
             includeItemTypes: [BaseItemKind.Audio],
             recursive: true,
-            limit: Math.min(80, JELLYFIN_MAX_LIMIT),
+            limit: Math.min(limit, JELLYFIN_MAX_LIMIT),
         })
         return await parseItemDtos(response.data.Items)
     }

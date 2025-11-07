@@ -29,8 +29,8 @@ export const SearchResults = () => {
             <div className="search-content">
                 {results.songs.length > 0 && (
                     <div className="section songs">
-                        <TrackList tracks={results.songs.slice(0, 10)} title={`Search results for '${query}'`} />
-                        {results.songs.length > 10 && (
+                        <TrackList tracks={results.songs} title={`Search results for '${query}'`} />
+                        {results.songs.length >= 10 && (
                             <div className="all-tracks">
                                 <Link to={`/search/${encodeURIComponent(query)}/tracks`} className="textlink">
                                     View all tracks
@@ -54,6 +54,13 @@ export const SearchResults = () => {
                             title={`Artists for '${query}'`}
                             hidden={{ view_artist: true }}
                         />
+                        {results.artists.length >= 10 && (
+                            <div className="all-tracks">
+                                <Link to={`/search/${encodeURIComponent(query)}/artists`} className="textlink">
+                                    View all artists
+                                </Link>
+                            </div>
+                        )}
                     </div>
                 )}
 
@@ -62,13 +69,23 @@ export const SearchResults = () => {
                         <div className="title">Albums</div>
                         <MediaList
                             items={results.albums.map(album => album._mediaItem)}
-                            infiniteData={{ pageParams: [1], pages: [results.albums.map(album => album._mediaItem)] }}
+                            infiniteData={{
+                                pageParams: [1],
+                                pages: [results.albums.map(album => album._mediaItem)],
+                            }}
                             isLoading={loading}
                             type="album"
                             title={`Albums for '${query}'`}
                             albumDisplayMode="artist"
                             hidden={{ view_album: true }}
                         />
+                        {results.albums.length >= 10 && (
+                            <div className="all-tracks">
+                                <Link to={`/search/${encodeURIComponent(query)}/albums`} className="textlink">
+                                    View all albums
+                                </Link>
+                            </div>
+                        )}
                     </div>
                 )}
 
@@ -86,6 +103,13 @@ export const SearchResults = () => {
                             title={`Playlists for '${query}'`}
                             // hidden={{ view_album: true }}
                         />
+                        {results.playlists.length >= 10 && (
+                            <div className="all-tracks">
+                                <Link to={`/search/${encodeURIComponent(query)}/playlists`} className="textlink">
+                                    View all playlists
+                                </Link>
+                            </div>
+                        )}
                     </div>
                 )}
 
@@ -102,6 +126,13 @@ export const SearchResults = () => {
                             type="genre"
                             title={`Genres for '${query}'`}
                         />
+                        {results.genres.length >= 10 && (
+                            <div className="all-tracks">
+                                <Link to={`/search/${encodeURIComponent(query)}/genres`} className="textlink">
+                                    View all genres
+                                </Link>
+                            </div>
+                        )}
                     </div>
                 )}
 
