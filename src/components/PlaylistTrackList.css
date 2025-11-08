@@ -311,7 +311,7 @@
 }
 
 .playlist-tracklist .track-item > .track-indicators > .download-state > .icon {
-    padding: 3px;
+    margin: 0 3px;
     fill: var(--font-color-tertiary);
     transition: fill 0.2s ease-out;
 }
@@ -345,7 +345,7 @@
 }
 
 .playlist-tracklist .track-item > .track-indicators > .favorited {
-    padding: 3px;
+    margin: 0 3px;
     color: var(--font-color-tertiary);
     transition: color 0.2s ease-out;
 }
