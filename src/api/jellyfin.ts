@@ -18,7 +18,7 @@ import { ItemFilter } from '@jellyfin/sdk/lib/generated-client/models/item-filte
 import { ItemSortBy } from '@jellyfin/sdk/lib/generated-client/models/item-sort-by'
 import { PlayMethod } from '@jellyfin/sdk/lib/generated-client/models/play-method'
 import { SortOrder } from '@jellyfin/sdk/lib/generated-client/models/sort-order'
-import { syncDownloads, syncDownloadsById } from '../context/DownloadContext/DownloadContext'
+import { syncDownloads, syncDownloadsById, unsyncDownloadsById } from '../context/DownloadContext/DownloadContext'
 
 export class ApiError extends Error {
     constructor(message: string, public response: Response) {
@@ -136,12 +136,13 @@ export const initJellyfinApi = ({ serverUrl, userId, token }: { serverUrl: strin
         return await parseItemDtos(response.data.Items)
     }
 
-    const searchArtists = async (searchTerm: string, limit = 20) => {
+    const searchArtists = async (searchTerm: string, limit = 20, startIndex = 0) => {
         const artistsApi = new ArtistsApi(api.configuration)
         const response = await artistsApi.getArtists(
             {
                 userId,
                 searchTerm,
+                startIndex,
                 limit: Math.min(limit, JELLYFIN_MAX_LIMIT),
             },
             { signal: AbortSignal.timeout(20000) }
@@ -149,7 +150,7 @@ export const initJellyfinApi = ({ serverUrl, userId, token }: { serverUrl: strin
         return await parseItemDtos(response.data.Items)
     }
 
-    const searchAlbumsDetailed = async (searchTerm: string, limit = 50) => {
+    const searchAlbumsDetailed = async (searchTerm: string, limit = 50, startIndex = 0) => {
         const itemsApi = new ItemsApi(api.configuration)
         const response = await itemsApi.getItems(
             {
@@ -157,6 +158,7 @@ export const initJellyfinApi = ({ serverUrl, userId, token }: { serverUrl: strin
                 searchTerm,
                 includeItemTypes: [BaseItemKind.MusicAlbum],
                 recursive: true,
+                startIndex,
                 limit: Math.min(limit, JELLYFIN_MAX_LIMIT),
             },
             { signal: AbortSignal.timeout(20000) }
@@ -164,7 +166,7 @@ export const initJellyfinApi = ({ serverUrl, userId, token }: { serverUrl: strin
         return await parseItemDtos(response.data.Items)
     }
 
-    const searchPlaylistsDetailed = async (searchTerm: string, limit = 50) => {
+    const searchPlaylistsDetailed = async (searchTerm: string, limit = 50, startIndex = 0) => {
         const itemsApi = new ItemsApi(api.configuration)
         const response = await itemsApi.getItems(
             {
@@ -172,6 +174,7 @@ export const initJellyfinApi = ({ serverUrl, userId, token }: { serverUrl: strin
                 searchTerm,
                 includeItemTypes: [BaseItemKind.Playlist],
                 recursive: true,
+                startIndex,
                 limit: Math.min(limit, JELLYFIN_MAX_LIMIT),
             },
             { signal: AbortSignal.timeout(20000) }
@@ -179,13 +182,14 @@ export const initJellyfinApi = ({ serverUrl, userId, token }: { serverUrl: strin
         return await parseItemDtos(response.data.Items)
     }
 
-    const searchGenres = async (searchTerm: string, limit = 20) => {
+    const searchGenres = async (searchTerm: string, limit = 20, startIndex = 0) => {
         const genresApi = new MusicGenresApi(api.configuration)
         const response = await genresApi.getMusicGenres(
             {
                 userId,
                 searchTerm,
                 includeItemTypes: [BaseItemKind.Audio],
+                startIndex,
                 limit: Math.min(limit, JELLYFIN_MAX_LIMIT),
             },
             { signal: AbortSignal.timeout(20000) }
@@ -462,7 +466,7 @@ export const initJellyfinApi = ({ serverUrl, userId, token }: { serverUrl: strin
 
         const items = await parseItemDtos(response.data.Items)
 
-        syncDownloadsById('JMA_CUSTOM_FAVORITES', items)
+        await syncDownloadsById('JMA_CUSTOM_FAVORITES', items)
 
         return items
     }
@@ -914,7 +918,7 @@ export const initJellyfinApi = ({ serverUrl, userId, token }: { serverUrl: strin
 
         const items = await parseItemDtos(response.data.Items)
 
-        syncDownloadsById(playlistId, items)
+        await syncDownloadsById(playlistId, items)
 
         return items
     }
@@ -997,14 +1001,15 @@ export const initJellyfinApi = ({ serverUrl, userId, token }: { serverUrl: strin
         return response.data.TotalRecordCount || null
     }
 
-    const fetchSongs = async (query: string) => {
+    const fetchSongs = async (query: string, limit = 80, startIndex = 0) => {
         const itemsApi = new ItemsApi(api.configuration)
         const response = await itemsApi.getItems({
             userId,
             searchTerm: query,
             includeItemTypes: [BaseItemKind.Audio],
             recursive: true,
-            limit: Math.min(10, JELLYFIN_MAX_LIMIT),
+            startIndex,
+            limit: Math.min(limit, JELLYFIN_MAX_LIMIT),
         })
         return await parseItemDtos(response.data.Items)
     }
@@ -1083,47 +1088,65 @@ export const initJellyfinApi = ({ serverUrl, userId, token }: { serverUrl: strin
         }&StartTimeTicks=0&EnableRedirection=true&EnableRemoteMedia=false`
     }
 
-    const addToFavorites = async (itemId: string) => {
+    const addToFavorites = async (item: MediaItem) => {
         const userLibraryApi = new UserLibraryApi(api.configuration)
 
-        return await userLibraryApi.markFavoriteItem({ itemId, userId }, { signal: AbortSignal.timeout(20000) })
+        const r = await userLibraryApi.markFavoriteItem(
+            { itemId: item.Id, userId },
+            { signal: AbortSignal.timeout(20000) }
+        )
+
+        await syncDownloadsById('JMA_CUSTOM_FAVORITES', [item])
+
+        return r
     }
 
-    const removeFromFavorites = async (itemId: string) => {
+    const removeFromFavorites = async (item: MediaItem) => {
         const userLibraryApi = new UserLibraryApi(api.configuration)
 
-        return await userLibraryApi.unmarkFavoriteItem({ itemId, userId }, { signal: AbortSignal.timeout(20000) })
+        const r = await userLibraryApi.unmarkFavoriteItem(
+            { itemId: item.Id, userId },
+            { signal: AbortSignal.timeout(20000) }
+        )
+
+        await unsyncDownloadsById('JMA_CUSTOM_FAVORITES', [item])
+
+        return r
     }
 
-    const addToPlaylist = async (playlistId: string, itemIds: string[]) => {
+    const addToPlaylist = async (playlistId: string, items: MediaItem[]) => {
         const playlistApi = new PlaylistsApi(api.configuration)
         const batchSize = 200
 
-        for (let i = 0; i < itemIds.length; i += batchSize) {
-            const batch = itemIds.slice(i, i + batchSize)
+        for (let i = 0; i < items.length; i += batchSize) {
+            const batch = items.slice(i, i + batchSize)
             await playlistApi.addItemToPlaylist(
                 {
                     userId,
                     playlistId,
-                    ids: batch,
+                    ids: batch.map(item => item.Id),
                 },
                 { signal: AbortSignal.timeout(20000) }
             )
         }
 
+        await syncDownloadsById(playlistId, items)
+
         return true
     }
 
-    const removeFromPlaylist = async (playlistId: string, itemId: string) => {
+    const removeFromPlaylist = async (playlistId: string, item: MediaItem) => {
         const playlistApi = new PlaylistsApi(api.configuration)
 
         const response = await playlistApi.removeItemFromPlaylist(
             {
                 playlistId,
-                entryIds: [itemId],
+                entryIds: [item.Id],
             },
             { signal: AbortSignal.timeout(20000) }
         )
+
+        await unsyncDownloadsById(playlistId, [item])
 
         return response.data
     }

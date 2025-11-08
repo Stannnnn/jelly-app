@@ -1,4 +1,3 @@
-import { BookmarkFillIcon, HeartFillIcon } from '@primer/octicons-react'
 import { useEffect } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { Loader } from '../components/Loader'
@@ -31,6 +30,13 @@ export const SearchResults = () => {
                 {results.songs.length > 0 && (
                     <div className="section songs">
                         <TrackList tracks={results.songs} title={`Search results for '${query}'`} />
+                        {results.songs.length >= 10 && (
+                            <div className="view-all">
+                                <Link to={`/search/${encodeURIComponent(query)}/tracks`} className="textlink">
+                                    View all tracks
+                                </Link>
+                            </div>
+                        )}
                     </div>
                 )}
 
@@ -48,6 +54,13 @@ export const SearchResults = () => {
                             title={`Artists for '${query}'`}
                             hidden={{ view_artist: true }}
                         />
+                        {results.artists.length >= 10 && (
+                            <div className="view-all">
+                                <Link to={`/search/${encodeURIComponent(query)}/artists`} className="textlink">
+                                    View all artists
+                                </Link>
+                            </div>
+                        )}
                     </div>
                 )}
 
@@ -56,13 +69,23 @@ export const SearchResults = () => {
                         <div className="title">Albums</div>
                         <MediaList
                             items={results.albums.map(album => album._mediaItem)}
-                            infiniteData={{ pageParams: [1], pages: [results.albums.map(album => album._mediaItem)] }}
+                            infiniteData={{
+                                pageParams: [1],
+                                pages: [results.albums.map(album => album._mediaItem)],
+                            }}
                             isLoading={loading}
                             type="album"
                             title={`Albums for '${query}'`}
                             albumDisplayMode="artist"
                             hidden={{ view_album: true }}
                         />
+                        {results.albums.length >= 10 && (
+                            <div className="view-all">
+                                <Link to={`/search/${encodeURIComponent(query)}/albums`} className="textlink">
+                                    View all albums
+                                </Link>
+                            </div>
+                        )}
                     </div>
                 )}
 
@@ -80,29 +103,36 @@ export const SearchResults = () => {
                             title={`Playlists for '${query}'`}
                             // hidden={{ view_album: true }}
                         />
+                        {results.playlists.length >= 10 && (
+                            <div className="view-all">
+                                <Link to={`/search/${encodeURIComponent(query)}/playlists`} className="textlink">
+                                    View all playlists
+                                </Link>
+                            </div>
+                        )}
                     </div>
                 )}
 
                 {results.genres.length > 0 && (
                     <div className="section genres">
                         <div className="title">Genres</div>
-                        <div className="section-list noSelect">
-                            {results.genres.map(genre => (
-                                <Link to={`/genre/${genre.id}`} key={genre.id} className="section-item">
-                                    <div className="icon">
-                                        <BookmarkFillIcon size={16} />
-                                    </div>
-                                    <div className="section-info">
-                                        <div className="name">{genre.name}</div>
-                                    </div>
-                                    {genre.isFavorite && (
-                                        <div className="favorited" title="Favorited">
-                                            <HeartFillIcon size={16} />
-                                        </div>
-                                    )}
+                        <MediaList
+                            items={results.genres.map(genre => genre._mediaItem)}
+                            infiniteData={{
+                                pageParams: [1],
+                                pages: [results.genres.map(genre => genre._mediaItem)],
+                            }}
+                            isLoading={loading}
+                            type="genre"
+                            title={`Genres for '${query}'`}
+                        />
+                        {results.genres.length >= 10 && (
+                            <div className="view-all">
+                                <Link to={`/search/${encodeURIComponent(query)}/genres`} className="textlink">
+                                    View all genres
                                 </Link>
-                            ))}
-                        </div>
+                            </div>
+                        )}
                     </div>
                 )}
 

@@ -250,6 +250,7 @@ const useInitialState = () => {
 
     // We need the addToDownloads in jellyfin API but we don't want to cause unnecessary re-renders
     window.addToDownloads = addToDownloads
+    window.removeFromDownloads = removeFromDownloads
 
     // Expose getDownloadState to check if an item is in the queue
     window.getDownloadState = (itemId: string) => {

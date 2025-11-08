@@ -43,7 +43,12 @@ import { NowPlayingLyrics } from './pages/NowPlayingLyrics'
 import { Playlist } from './pages/Playlist'
 import { Queue } from './pages/Queue'
 import { RecentlyPlayed } from './pages/RecentlyPlayed'
+import { SearchAlbums } from './pages/SearchAlbums'
+import { SearchArtists } from './pages/SearchArtists'
+import { SearchGenres } from './pages/SearchGenres'
+import { SearchPlaylists } from './pages/SearchPlaylists'
 import { SearchResults } from './pages/SearchResults'
+import { SearchTracks } from './pages/SearchTracks'
 import { Settings } from './pages/Settings'
 import { Tracks } from './pages/Tracks'
 import { persister, queryClient } from './queryClient'
@@ -262,6 +267,11 @@ const MainLayout = ({ auth, handleLogout }: { auth: AuthData; handleLogout: () =
                             <Route path="/settings" element={<Main content={memoSettings} />} />
                             <Route path="/instantmix/:songId" element={<Main content={InstantMix} />} />
                             <Route path="/search/:query" element={<Main content={SearchResults} />} />
+                            <Route path="/search/:query/tracks" element={<Main content={SearchTracks} />} />
+                            <Route path="/search/:query/artists" element={<Main content={SearchArtists} />} />
+                            <Route path="/search/:query/albums" element={<Main content={SearchAlbums} />} />
+                            <Route path="/search/:query/playlists" element={<Main content={SearchPlaylists} />} />
+                            <Route path="/search/:query/genres" element={<Main content={SearchGenres} />} />
                             <Route path="*" element={<Navigate to="/" />} />
                         </Routes>
                     </div>

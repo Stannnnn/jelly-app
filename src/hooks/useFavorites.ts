@@ -8,7 +8,7 @@ export const useFavorites = () => {
 
     return {
         addToFavorites: async (item: MediaItem) => {
-            const res = await api.addToFavorites(item.Id)
+            const res = await api.addToFavorites(item)
 
             prependItemsToQueryData(['favorites', item.Type || ''], [item])
 
@@ -17,7 +17,7 @@ export const useFavorites = () => {
             })
         },
         removeFromFavorites: async (item: MediaItem) => {
-            const res = await api.removeFromFavorites(item.Id)
+            const res = await api.removeFromFavorites(item)
 
             removeItemFromQueryData(['favorites', item.Type || ''], item.Id)
 

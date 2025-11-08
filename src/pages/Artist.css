@@ -234,7 +234,7 @@
     margin-top: 10px;
 }
 
-.all-tracks > a.textlink {
+.artist-page > .artist-content > .section.top-songs > .all-tracks > a.textlink {
     color: var(--font-color-tertiary);
 }
 

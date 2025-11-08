@@ -37,3 +37,20 @@ export const syncDownloadsById = async (containerId: string, items: MediaItem[])
         }
     }
 }
+
+export const unsyncDownloadsById = async (containerId: string, items: MediaItem[]) => {
+    const isDownloaded = containerId ? await window.audioStorage.hasTrack(containerId) : false
+
+    if (isDownloaded) {
+        const toRemove = items.filter(track => track.offlineState !== undefined)
+
+        if (toRemove.length) {
+            // Explicitly set offlineState to 'deleting' since removeFromDownloads happens before they are stored in react-query, so that patch will fail
+            for (const track of toRemove) {
+                track.offlineState = 'deleting'
+            }
+
+            window.removeFromDownloads(toRemove)
+        }
+    }
+}

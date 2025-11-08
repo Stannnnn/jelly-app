@@ -8,19 +8,15 @@ export const usePlaylists = () => {
 
     return {
         addToPlaylist: async (item: MediaItem, playlistId: string) => {
-            await api.addToPlaylist(playlistId, [item.Id])
+            await api.addToPlaylist(playlistId, [item])
             prependItemsToQueryData(['playlistTracks', playlistId], [item])
         },
         addItemsToPlaylist: async (items: MediaItem[], playlistId: string) => {
-            await api.addToPlaylist(
-                playlistId,
-                items.map(item => item.Id)
-            )
-
+            await api.addToPlaylist(playlistId, items)
             prependItemsToQueryData(['playlistTracks', playlistId], items)
         },
         removeFromPlaylist: async (item: MediaItem, playlistId: string) => {
-            await api.removeFromPlaylist(playlistId, item.Id)
+            await api.removeFromPlaylist(playlistId, item)
             removeItemFromQueryData(['playlistTracks', playlistId], item.Id)
         },
         createPlaylist: async (name: string) => {

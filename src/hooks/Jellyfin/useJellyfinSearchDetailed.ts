@@ -44,7 +44,7 @@ export const useJellyfinSearchDetailed = (query: string | undefined) => {
                     api.searchArtists(query, 10),
                     api.searchAlbumsDetailed(query, 10),
                     api.searchPlaylistsDetailed(query, 10),
-                    api.fetchSongs(query),
+                    api.fetchSongs(query, 10),
                     api.searchGenres(query, 10),
                 ])
 
