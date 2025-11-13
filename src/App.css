@@ -1159,7 +1159,12 @@ body.lockscroll {
 .genres-page,
 .artist-tracks-page,
 .artists-page,
-.lyrics-page {
+.lyrics-page,
+.search-albums-page,
+.search-artists-page,
+.search-genres-page,
+.search-playlists-page,
+.search-tracks-page {
     margin-top: -4px;
 }
 
