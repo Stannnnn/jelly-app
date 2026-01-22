@@ -214,9 +214,7 @@
     display: inline;
     position: relative;
 
-    /* progress 0..1 written by rAF */
     --p: 0;
-
     --base-alpha: 0.5;
     --fill-alpha: 1;
 
@@ -245,26 +243,28 @@
     -webkit-text-fill-color: transparent;
 }
 
-/* Past words in current line */
-.lyrics-page.synced > .lyrics-line:not(.active) > .text > .lyric-word.active {
-    opacity: 0.7;
-    background-color: var(--brand-color);
-}
-
 /* Active line words */
 .lyrics-page.synced > .lyrics-line.active > .text > .lyric-word {
     --base-alpha: 0.7;
 }
 
-/* Past words in current line */
+/* Past words in active line: fully filled */
 .lyrics-page.synced > .lyrics-line.active > .text > .lyric-word.active {
     --p: 1;
     --base-alpha: 1;
+    --fill-alpha: 1;
 }
 
-/* Current word just uses the animated --p (set by rAF) */
+/* Current word uses animated --p (set by rAF) */
 .lyrics-page.synced > .lyrics-line.active > .text > .lyric-word.current {
     --base-alpha: 0.7;
+}
+
+/* Past words in non-active lines: lightly highlighted */
+.lyrics-page.synced > .lyrics-line:not(.active) > .text > .lyric-word.active {
+    --p: 1; /* keep it "filled" */
+    --base-alpha: 0.7; /* your "lightly highlighted" */
+    --fill-alpha: 0.35; /* amount of brand tint */
 }
 
 /* Responsive */

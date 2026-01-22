@@ -1,4 +1,4 @@
-import { RefObject, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { Loader } from '../components/Loader'
 import { usePlaybackContext } from '../context/PlaybackContext/PlaybackContext'
@@ -8,17 +8,21 @@ import { LyricLine } from '@jellyfin/sdk/lib/generated-client'
 type LyricLineCue = { Position: number; EndPosition: number; Start: number; End: number }
 type LyricLineData = LyricLine & { Cues?: LyricLineCue[] }
 
+type CueRangeMs = { s: number; e: number }
+
 export const Lyrics = () => {
     const playback = usePlaybackContext()
     const audio = playback.audioRef as HTMLAudioElement | undefined
 
     const [currentTimeMs, setCurrentTimeMs] = useState<number | null>(null)
+    const [currentLineIndex, setCurrentLineIndex] = useState<number>(-1)
+
     const lineRefs = useRef<Array<HTMLDivElement | null>>([])
     const rafId = useRef<number | null>(null)
 
     const prevWordElsRef = useRef<HTMLElement[]>([])
     const activeWordElsRef = useRef<HTMLElement[]>([])
-    const activeWordCuesRef = useRef<LyricLineCue[]>([])
+    const activeWordCuesRef = useRef<CueRangeMs[]>([])
     const lastActiveLineRef = useRef<number>(-1)
 
     const clamp01 = (v: number) => (v < 0 ? 0 : v > 1 ? 1 : v)
@@ -45,89 +49,26 @@ export const Lyrics = () => {
         return (hours > 0 ? `${hh}:` : '') + `${mm}:${ss}.${cc}`
     }
 
-    const timeDiff = (startTicks: number | null, timeMs: number | null) => {
-        return (startTicks || 0) / 10000 - (timeMs || 0)
-    }
-
     const lyrics = playback.currentTrackLyrics?.Lyrics as unknown as LyricLineData[] | undefined
 
-    // Builds a list of relevant times to update currentTime
-    const eventTimesMs = useMemo(() => {
-        const rawTimes: number[] = []
+    const isSynced = useMemo(() => !!(lyrics && lyrics[0].Start != null), [lyrics])
+    const isWordByWord = useMemo(() => !!(lyrics && lyrics[0].Cues && lyrics[0].Cues.length > 0), [lyrics])
 
-        lyrics?.forEach(line => {
-            if (typeof line.Start === 'number') rawTimes.push(line.Start / 10000)
-
-            line.Cues?.forEach(cue => {
-                if (typeof cue.Start === 'number') rawTimes.push(cue.Start / 10000)
-                if (typeof cue.End === 'number') rawTimes.push(cue.End / 10000)
-            })
-        })
-
-        // Deduplicate Times and sort
-        return Array.from(new Set(rawTimes).values()).sort()
-    }, [lyrics])
-
-    const nextEventTimeMs = useMemo(() => {
-        return eventTimesMs.find(t => t > (currentTimeMs || 0))
-    }, [currentTimeMs, eventTimesMs])
-
-    const isSynced = useMemo(() => {
-        if (!lyrics || lyrics[0].Start === null || lyrics[0].Start === undefined) return false
-        return true
-    }, [lyrics])
-
-    const isWordByWord = useMemo(() => {
-        if (!lyrics || lyrics[0].Cues === null || lyrics[0].Cues?.length === 0) return false
-        return true
-    }, [lyrics])
-
-    const currentLineIndex = useMemo(() => {
-        if (!audio || !lyrics) return -1
-
-        const index = lyrics.findIndex(line => timeDiff(line?.Start || 0, currentTimeMs) > 0)
-
-        return lyrics ? (index >= 0 ? index - 1 : lyrics.length - 1) : -1
-    }, [audio, lyrics, currentTimeMs])
-
-    // Uses timeout for precise lyrics timing
-    //  - Necessary because audio time updates happen every 200ms or so; too slow
-    const nextLineTimeout: RefObject<NodeJS.Timeout | null> = useRef(null)
-    const clearNextLineTimeout = () => {
-        if (nextLineTimeout.current) {
-            clearTimeout(nextLineTimeout.current)
-            nextLineTimeout.current = null
-        }
-    }
-
-    useEffect(() => {
-        if (nextEventTimeMs === undefined || currentTimeMs === null) return
-
-        const millis = nextEventTimeMs - currentTimeMs + 1
-
-        if (millis > 0) {
-            // Sets timeout to diff from next line and last currentTime update
-            nextLineTimeout.current = setTimeout(() => {
-                if (currentTimeMs && playback.isPlaying) setCurrentTimeMs(nextEventTimeMs + 1)
-                clearNextLineTimeout()
-            }, millis)
-        }
-
-        return clearNextLineTimeout
-    }, [playback.isPlaying, currentTimeMs, currentLineIndex, nextEventTimeMs])
-
-    useEffect(() => {
-        clearNextLineTimeout()
-    }, [audio, lyrics])
+    // Use audio clock while playing, fallback to state when paused/not ready.
+    const getNowMs = useCallback(() => {
+        if (playback.isPlaying && audio) return audio.currentTime * 1000
+        return currentTimeMs ?? 0
+    }, [audio, playback.isPlaying, currentTimeMs])
 
     const resetAllWordProgress = useCallback(() => {
         document.querySelectorAll<HTMLElement>('.lyric-word').forEach(el => {
-            el.style.setProperty('--p', '0')
+            el.style.removeProperty('--p')
         })
     }, [])
 
+    // Keep currentTimeMs updated for paused UI and initial render.
     useEffect(() => {
-        if (!audio || !lyrics) return
+        if (!audio) return
 
         const updateCurrentTime = () => {
             if (!audio.duration) {
@@ -137,28 +78,53 @@ export const Lyrics = () => {
             setCurrentTimeMs(audio.currentTime * 1000 || 0)
         }
 
-        const onSeeking = () => {
-            resetAllWordProgress()
-            updateCurrentTime()
-        }
-
-        const onSeeked = () => {
+        const onSeek = () => {
             resetAllWordProgress()
             updateCurrentTime()
         }
 
         audio.addEventListener('timeupdate', updateCurrentTime)
         audio.addEventListener('playing', updateCurrentTime)
-        audio.addEventListener('seeking', onSeeking)
-        audio.addEventListener('seeked', onSeeked)
+        audio.addEventListener('seeking', onSeek)
+        audio.addEventListener('seeked', onSeek)
 
         return () => {
             audio.removeEventListener('timeupdate', updateCurrentTime)
             audio.removeEventListener('playing', updateCurrentTime)
-            audio.removeEventListener('seeking', onSeeking)
-            audio.removeEventListener('seeked', onSeeked)
+            audio.removeEventListener('seeking', onSeek)
+            audio.removeEventListener('seeked', onSeek)
         }
-    }, [audio, lyrics, currentLineIndex, resetAllWordProgress])
+    }, [audio, resetAllWordProgress])
+
+    // Compute current line index from "now" without timeouts.
+    // While playing, rAF will keep this in sync
+    useEffect(() => {
+        if (!audio || !lyrics) {
+            setCurrentLineIndex(-1)
+            return
+        }
+
+        const findLineIndex = (tMs: number) => {
+            let lo = 0
+            let hi = lyrics.length - 1
+            let ans = -1
+
+            while (lo <= hi) {
+                const mid = (lo + hi) >> 1
+                const s = (lyrics[mid].Start ?? 0) / 10000
+                if (s <= tMs) {
+                    ans = mid
+                    lo = mid + 1
+                } else {
+                    hi = mid - 1
+                }
+            }
+            return ans
+        }
+
+        const tMs = getNowMs()
+        setCurrentLineIndex(findLineIndex(tMs))
+    }, [audio, lyrics, getNowMs])
 
     const scrollToActiveLine = useCallback(
         (line: number, behavior: ScrollBehavior = 'smooth') => {
@@ -184,14 +150,14 @@ export const Lyrics = () => {
     const goToLine = useCallback(
         (index: number) => {
             const audio = playback.audioRef as HTMLAudioElement | undefined
-
             if (audio && lyrics && lyrics[index]?.Start) {
                 setCurrentTimeMs(lyrics[index].Start / 10000)
                 audio.currentTime = lyrics[index].Start / 10000000
+                resetAllWordProgress()
                 if (isSynced) scrollToActiveLine(index)
             }
         },
-        [isSynced, lyrics, playback.audioRef, scrollToActiveLine]
+        [lyrics, playback.audioRef, isSynced, scrollToActiveLine, resetAllWordProgress]
     )
 
     const displayedLyricsLine = useCallback(
@@ -201,14 +167,15 @@ export const Lyrics = () => {
             const cues = line.Cues ?? []
             if (cues.length === 0) return line.Text
 
+            const tMs = getNowMs()
+
             return cues.map((cue, i) => {
                 const chunk = line.Text?.slice(cue.Position, cue.EndPosition) ?? ''
-
                 const startMs = cue.Start / 10000
                 const endMs = cue.End / 10000
 
-                const isPast = currentTimeMs != null && endMs <= currentTimeMs
-                const isCurrent = currentTimeMs != null && startMs <= currentTimeMs && currentTimeMs < endMs
+                const isPast = endMs <= tMs
+                const isCurrent = startMs <= tMs && tMs < endMs
 
                 return (
                     <span
@@ -218,14 +185,14 @@ export const Lyrics = () => {
                         data-end={endMs}
                         data-text={chunk}
                     >
-                        {chunk.startsWith(' ') ? '\u00A0' : ''}
+                        {i < cues.length - 1 && chunk.startsWith(' ') ? '\u00A0' : ''}
                         {chunk}
-                        {chunk.endsWith(' ') ? '\u00A0' : ''}
+                        {i < cues.length - 1 && chunk.endsWith(' ') ? '\u00A0' : ''}
                     </span>
                 )
             })
         },
-        [isWordByWord, currentTimeMs]
+        [isWordByWord, getNowMs]
     )
 
     const displayedLines = useMemo(() => {
@@ -242,9 +209,7 @@ export const Lyrics = () => {
                     onClick={() => goToLine(index)}
                 >
                     {isSynced && playback.lyricsTimestamps ? (
-                        <div className="numbers">
-                            {line.Start !== null && line.Start !== undefined && tickToTimeString(line.Start)}
-                        </div>
+                        <div className="numbers">{line.Start != null ? tickToTimeString(line.Start) : null}</div>
                     ) : null}
                     <div className={'text' + (playback.centeredLyrics ? ' centered' : '')}>
                         {displayedLyricsLine(line)}
@@ -253,26 +218,24 @@ export const Lyrics = () => {
             )) || null
         )
     }, [
+        lyrics,
         playback.currentTrack,
         goToLine,
-        displayedLyricsLine,
+        isSynced,
         playback.lyricsTimestamps,
         playback.centeredLyrics,
-        lyrics,
+        displayedLyricsLine,
         currentLineIndex,
-        isSynced,
     ])
 
+    // Cache current line word elements (only when line changes)
     useEffect(() => {
-        if (!lyrics) return
-        if (!isWordByWord) return
-
+        if (!lyrics || !isWordByWord) return
         if (currentLineIndex === lastActiveLineRef.current) return
+
         lastActiveLineRef.current = currentLineIndex
 
-        // Reset previous cached line so it does not stay filled when it becomes future
-        for (const el of prevWordElsRef.current) el.style.setProperty('--p', '0')
-        prevWordElsRef.current = []
+        for (const el of prevWordElsRef.current) el.style.removeProperty('--p')
 
         const lineEl = lineRefs.current[currentLineIndex]
         if (!lineEl) {
@@ -285,29 +248,40 @@ export const Lyrics = () => {
         activeWordElsRef.current = wordEls
         prevWordElsRef.current = wordEls
 
-        const cues: LyricLineCue[] = wordEls.map(el => {
-            const start = Number(el.dataset.start ?? 'NaN')
-            const end = Number(el.dataset.end ?? 'NaN')
-            return { Position: 0, EndPosition: 0, Start: start, End: end }
-        })
-        activeWordCuesRef.current = cues
+        const ranges: CueRangeMs[] = wordEls.map(el => ({
+            s: Number(el.dataset.start ?? 'NaN'),
+            e: Number(el.dataset.end ?? 'NaN'),
+        }))
+        activeWordCuesRef.current = ranges
 
-        // Reset fill vars for new line
         for (const el of wordEls) el.style.setProperty('--p', '0')
     }, [currentLineIndex, lyrics, isWordByWord])
 
+    // rAF drives fill + line index updates while playing
     useEffect(() => {
-        if (!audio) return
+        if (!audio || !lyrics) return
 
         const stop = () => {
-            if (rafId.current != null) {
-                cancelAnimationFrame(rafId.current)
-                rafId.current = null
+            if (rafId.current != null) cancelAnimationFrame(rafId.current)
+            rafId.current = null
+        }
+
+        const findLineIndex = (tMs: number) => {
+            let lo = 0
+            let hi = lyrics.length - 1
+            let ans = -1
+            while (lo <= hi) {
+                const mid = (lo + hi) >> 1
+                const s = (lyrics[mid].Start ?? 0) / 10000
+                if (s <= tMs) {
+                    ans = mid
+                    lo = mid + 1
+                } else hi = mid - 1
             }
+            return ans
         }
 
         const frame = () => {
-            // If paused or no lyrics, do not process
             if (!playback.isPlaying) {
                 stop()
                 return
@@ -315,24 +289,25 @@ export const Lyrics = () => {
 
             const tMs = audio.currentTime * 1000
 
+            // Update current line index only when it changes
+            const li = findLineIndex(tMs)
+            if (li !== currentLineIndex) setCurrentLineIndex(li)
+
             if (isWordByWord) {
                 const els = activeWordElsRef.current
                 const cues = activeWordCuesRef.current
-
                 if (els.length === cues.length && els.length > 0) {
                     for (let i = 0; i < els.length; i++) {
-                        const s = cues[i].Start
-                        const e = cues[i].End
+                        const s = cues[i].s
+                        const e = cues[i].e
 
-                        // if missing end
-                        if (!Number.isFinite(s) || !Number.isFinite(e) || e <= s) {
-                            // fallback: if started, mark as filled
-                            const p = tMs >= s ? 1 : 0
-                            els[i].style.setProperty('--p', String(p))
-                            continue
+                        let p = 0
+                        if (Number.isFinite(s) && Number.isFinite(e) && e > s) {
+                            p = clamp01((tMs - s) / (e - s))
+                        } else if (Number.isFinite(s)) {
+                            p = tMs >= s ? 1 : 0
                         }
 
-                        const p = clamp01((tMs - s) / (e - s))
                         els[i].style.setProperty('--p', p.toFixed(4))
                     }
                 }
@@ -341,13 +316,9 @@ export const Lyrics = () => {
             rafId.current = requestAnimationFrame(frame)
         }
 
-        if (playback.isPlaying) {
-            // Start loop
-            rafId.current = requestAnimationFrame(frame)
-        }
-
+        if (playback.isPlaying) rafId.current = requestAnimationFrame(frame)
         return stop
-    }, [audio, playback.isPlaying, isWordByWord, lyrics, currentLineIndex])
+    }, [audio, lyrics, playback.isPlaying, isWordByWord, currentLineIndex])
 
     // Scroll on line change
     useEffect(() => {
@@ -356,9 +327,7 @@ export const Lyrics = () => {
 
     // Scroll to top when audio source changes (new track)
     useEffect(() => {
-        if (audio?.src) {
-            window.scrollTo({ top: 0, behavior: 'auto' })
-        }
+        if (audio?.src) window.scrollTo({ top: 0, behavior: 'auto' })
     }, [audio?.src, location.pathname])
 
     return (
