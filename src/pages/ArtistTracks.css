@@ -141,8 +141,8 @@
     font-size: 0.7rem;
     font-weight: 500;
     width: 100%;
-    max-width: 126px;
-    padding: 7px 8px 7px 28px;
+    max-width: 134px;
+    padding: 7px 10px 7px 28px;
     background-color: rgba(0, 0, 0, 0);
     text-overflow: ellipsis;
 }
