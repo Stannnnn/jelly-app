@@ -70,7 +70,7 @@ const useInitialState = () => {
     // Resize handler to update isTouchDevice and reset dropdown on viewport changes
     useEffect(() => {
         const handleResize = () => {
-            const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0 || window.innerWidth <= 480
+            const isTouch = window.matchMedia('(pointer: coarse)').matches || window.innerWidth <= 480
             setIsTouchDevice(isTouch)
             if (isOpen && document.activeElement?.tagName !== 'INPUT') {
                 setIsOpen(false)
@@ -342,7 +342,7 @@ const useInitialState = () => {
     }, [subDropdown.isOpen, subDropdown.measured, subDropdown.triggerRect])
 
     useEffect(() => {
-        const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0 || window.innerWidth <= 480
+        const isTouch = window.matchMedia('(pointer: coarse)').matches || window.innerWidth <= 480
         setIsTouchDevice(isTouch)
     }, [])
 
