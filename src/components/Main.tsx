@@ -332,7 +332,7 @@ export const MainContent = ({
                                     </div>
                                 )}
                                 <div className="overlay">
-                                    <ExpandIcon width={14} height={14} className="icon" />
+                                    <ExpandIcon width={18} height={18} className="icon" />
                                 </div>
                             </Squircle>
                         </Link>

@@ -236,7 +236,7 @@ html.dark {
     --playing-bg-color-secondary: rgba(255, 255, 255, 0.08);
     --playing-bg-color-tertiary: rgba(255, 255, 255, 0.16);
     --playing-bg-color-quaternary: rgba(255, 255, 255, 0.32);
-    --playing-border-color: rgba(255, 255, 255, 0.06);
+    --playing-border-color: rgba(255, 255, 255, 0.08);
     --playing-font-color: rgba(255, 255, 255, 0.4);
     --playing-font-color-active: rgba(255, 255, 255, 0.7);
 }
@@ -1370,6 +1370,7 @@ body.lockscroll {
     }
 
     .main > .main_footer > .playback > .container > .controls > .knobs {
+        margin-top: 8px;
         margin-right: 6px;
     }
 
