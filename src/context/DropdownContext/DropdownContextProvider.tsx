@@ -341,6 +341,79 @@ const useInitialState = () => {
         }))
     }, [subDropdown.isOpen, subDropdown.measured, subDropdown.triggerRect])
 
+    // Helper function measure mobile dropdown height
+    const measureElement = useCallback((el: HTMLDivElement | null): number => {
+        if (!el) return 0
+
+        const old = {
+            display: el.style.display,
+            visibility: el.style.visibility,
+            position: el.style.position,
+            height: el.style.height,
+        }
+
+        el.style.display = 'block'
+        el.style.visibility = 'hidden'
+        el.style.position = 'absolute'
+        el.style.height = 'auto'
+
+        void el.offsetHeight
+
+        const height = el.scrollHeight
+
+        Object.assign(el.style, old)
+        return height
+    }, [])
+
+    // Animate mobile dropdown height
+    useLayoutEffect(() => {
+        if (!isTouchDevice || !menuRef.current) return
+
+        const dropdownEl = menuRef.current
+
+        // Use double RAF for reliable animation after DOM update?
+        const animateHeight = () => {
+            requestAnimationFrame(() => {
+                const naturalHeight = measureElement(dropdownEl)
+
+                if (naturalHeight > 0) {
+                    // Capture current rendered height to prevent content jump
+                    const currentHeight = dropdownEl.getBoundingClientRect().height || 0
+
+                    dropdownEl.style.height = `${currentHeight}px`
+
+                    // Transition height on next frame
+                    requestAnimationFrame(() => {
+                        dropdownEl.style.height = `${naturalHeight}px`
+                    })
+                }
+            })
+        }
+
+        animateHeight()
+    }, [
+        isTouchDevice,
+        subDropdown.isOpen,
+        subDropdown.type,
+        playlistName,
+        renamePlaylistName,
+        isCreatingPlaylist,
+        isRenamingPlaylist,
+        playlists?.length,
+        context,
+        measureElement,
+    ])
+
+    // Reset dimensions on menu close
+    useEffect(() => {
+        if (isOpen) return
+
+        const dropdownEl = menuRef.current
+        if (dropdownEl) {
+            dropdownEl.style.height = ''
+        }
+    }, [isOpen])
+
     useEffect(() => {
         const isTouch = window.matchMedia('(pointer: coarse)').matches || window.innerWidth <= 480
         setIsTouchDevice(isTouch)
