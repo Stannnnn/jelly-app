@@ -36,11 +36,13 @@ export const ArtistTracks = () => {
     const { searchResults, searchLoading } = useJellyfinSearch(searchQuery)
 
     const filteredTracks = searchQuery
-        ? searchResults.filter(
-              item =>
-                  item.Type === 'Audio' &&
-                  (item.ArtistItems?.some(a => a.Id === artistId) || item.AlbumArtists?.some(a => a.Id === artistId))
-          )
+        ? searchResults.length > 0
+            ? searchResults.filter(
+                  item =>
+                      item.Type === 'Audio' &&
+                      (item.ArtistItems?.some(a => a.Id === artistId) || item.AlbumArtists?.some(a => a.Id === artistId))
+              )
+            : allTracks
         : allTracks
 
     const handleClearSearch = () => {
@@ -175,7 +177,7 @@ export const ArtistTracks = () => {
             <PlaylistTrackList
                 tracks={filteredTracks}
                 infiniteData={searchQuery ? undefined : infiniteData}
-                isLoading={searchQuery ? searchLoading : isLoading}
+                isLoading={searchQuery ? (searchLoading && searchResults.length === 0 && allTracks.length === 0) : isLoading}
                 showType="album"
                 title={artist ? `${artist.Name}'s Tracks` : 'Artist Tracks'}
                 reviver={reviver}

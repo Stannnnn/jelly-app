@@ -18,7 +18,7 @@ export const useJellyfinSearch = (searchQuery: string) => {
         return () => clearTimeout(debounceTimer)
     }, [searchQuery])
 
-    const { data, isLoading, error } = useQuery<MediaItem[], Error>({
+    const { data, isFetching, error } = useQuery<MediaItem[], Error>({
         queryKey: ['search', debouncedSearchQuery],
         placeholderData: keepPreviousData,
         queryFn: async () => {
@@ -55,7 +55,7 @@ export const useJellyfinSearch = (searchQuery: string) => {
 
     return {
         searchResults: data || [],
-        searchLoading: isLoading,
+        searchLoading: isFetching || debouncedSearchQuery !== searchQuery,
         searchError: error ? error.message : null,
         searchAttempted: searchQuery.length > 0,
     }

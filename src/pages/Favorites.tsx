@@ -26,7 +26,9 @@ export const Favorites = () => {
     const { searchResults, searchLoading } = useJellyfinSearch(searchQuery)
 
     const filteredTracks = searchQuery
-        ? searchResults.filter(item => item.Type === 'Audio' && item.UserData?.IsFavorite === true)
+        ? searchResults.length > 0
+            ? searchResults.filter(item => item.Type === 'Audio' && item.UserData?.IsFavorite === true)
+            : items
         : items
 
     const handleClearSearch = () => {
@@ -156,7 +158,7 @@ export const Favorites = () => {
                 <PlaylistTrackList
                     tracks={filteredTracks}
                     infiniteData={searchQuery ? undefined : infiniteData}
-                    isLoading={searchQuery ? searchLoading : isLoading}
+                    isLoading={searchQuery ? (searchLoading && searchResults.length === 0 && items.length === 0) : isLoading}
                     reviver={reviver}
                     loadMore={searchQuery ? undefined : loadMore}
                     title={'Favorites'}

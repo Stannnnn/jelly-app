@@ -183,7 +183,7 @@ export const Sidenav = (props: { username: string }) => {
                                                 results
                                             </div>
                                         )}
-                                    {!searchLoading && !searchError && searchResults.length > 0 && (
+                                    {!searchError && searchResults.length > 0 && (
                                         <div className="results noSelect">
                                             {searchResults.map(item => {
                                                 const isActive =
