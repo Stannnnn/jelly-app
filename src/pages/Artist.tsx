@@ -4,6 +4,7 @@ import { Link, useParams } from 'react-router-dom'
 import { JellyImg } from '../components/JellyImg'
 import { Loader } from '../components/Loader'
 import { DownloadIndicators, MediaList } from '../components/MediaList'
+import { Skeleton } from '../components/Skeleton'
 import { Squircle } from '../components/Squircle'
 import { MoreIcon } from '../components/SvgIcons'
 import { TrackList } from '../components/TrackList'
@@ -29,6 +30,7 @@ export const Artist = () => {
         totalPlays,
         totalAlbumCount,
         loading,
+        statsLoading,
         error,
     } = useJellyfinArtistData(artistId!)
     const {
@@ -172,44 +174,50 @@ export const Artist = () => {
                     </div>
                 )}
 
-                {albums.length > 0 && (
-                    <div className="section albums">
-                        <div className="title">Albums</div>
-                        <div className="desc">Complete discography</div>
-                        <MediaList
-                            items={albums}
-                            infiniteData={{ pageParams: [1], pages: [albums] }}
-                            isLoading={loading}
-                            type="album"
-                            albumDisplayMode="year"
-                            title={artist.Name ? `${artist.Name} Albums` : 'Albums'}
-                            hidden={{ view_album: true, view_artist: true }}
-                        />
+                {(statsLoading || playlistsLoading) && albums.length === 0 && playlists.length === 0 ? (
+                    <div className="section skeleton-bottom">
+                        {Array.from({ length: 6 }).map((_, i) => (
+                            <div key={i} className="media-item album-item">
+                                <Skeleton type="album" />
+                            </div>
+                        ))}
                     </div>
-                )}
+                ) : (
+                    <>
+                        {albums.length > 0 && (
+                            <div className="section albums">
+                                <div className="title">Albums</div>
+                                <div className="desc">Complete discography</div>
+                                <MediaList
+                                    items={albums}
+                                    infiniteData={{ pageParams: [1], pages: [albums] }}
+                                    isLoading={loading}
+                                    type="album"
+                                    albumDisplayMode="year"
+                                    title={artist.Name ? `${artist.Name} Albums` : 'Albums'}
+                                    hidden={{ view_album: true, view_artist: true }}
+                                />
+                            </div>
+                        )}
 
-                {appearsInAlbums.length > 0 && (
-                    <div className="section appears-in">
-                        <div className="title">Appears In</div>
-                        <div className="desc">Additional recordings</div>
-                        <MediaList
-                            items={appearsInAlbums}
-                            infiniteData={{ pageParams: [1], pages: [appearsInAlbums] }}
-                            isLoading={loading}
-                            type="album"
-                            albumDisplayMode="both"
-                            title={artist.Name ? `${artist.Name} Albums` : 'Albums'}
-                            hidden={{ view_album: true }}
-                        />
-                    </div>
-                )}
+                        {appearsInAlbums.length > 0 && (
+                            <div className="section appears-in">
+                                <div className="title">Appears In</div>
+                                <div className="desc">Additional recordings</div>
+                                <MediaList
+                                    items={appearsInAlbums}
+                                    infiniteData={{ pageParams: [1], pages: [appearsInAlbums] }}
+                                    isLoading={loading}
+                                    type="album"
+                                    albumDisplayMode="both"
+                                    title={artist.Name ? `${artist.Name} Albums` : 'Albums'}
+                                    hidden={{ view_album: true }}
+                                />
+                            </div>
+                        )}
 
-                {playlists.length > 0 && (
-                    <div className="section playlists">
-                        {playlistsLoading ? (
-                            <Loader />
-                        ) : (
-                            <>
+                        {playlists.length > 0 && (
+                            <div className="section playlists">
                                 <div className="title">Playlists</div>
                                 <div className="desc">Included in curated collections</div>
                                 <MediaList
@@ -218,12 +226,11 @@ export const Artist = () => {
                                     isLoading={playlistsLoading}
                                     type="playlist"
                                     title={artist.Name ? `${artist.Name} Playlists` : 'Playlists'}
-                                    // hidden={{ view_album: true }}
                                 />
-                            </>
+                                {playlistsError && <div className="error">{playlistsError}</div>}
+                            </div>
                         )}
-                        {playlistsError && !playlistsLoading && <div className="error">{playlistsError}</div>}
-                    </div>
+                    </>
                 )}
             </div>
         </div>

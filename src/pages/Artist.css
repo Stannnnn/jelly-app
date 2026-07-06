@@ -227,6 +227,14 @@
     margin-bottom: 6px;
 }
 
+.artist-page > .artist-content > .section.skeleton-bottom > .media-item {
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    margin: 0 -8px;
+    border-radius: 8px;
+}
+
 .artist-page > .artist-content > .section.top-songs > .all-tracks {
     font-size: 0.725rem;
     font-weight: 500;
