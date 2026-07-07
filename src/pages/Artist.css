@@ -227,6 +227,24 @@
     margin-bottom: 6px;
 }
 
+.artist-page > .artist-content > .section.skeleton-bottom {
+    margin-bottom: 36px;
+}
+
+.artist-page > .artist-content > .section.skeleton-bottom > .skeleton-title {
+    height: 18px;
+    width: 62px;
+    border-radius: 4px;
+    margin-bottom: 4px;
+}
+
+.artist-page > .artist-content > .section.skeleton-bottom > .skeleton-desc {
+    height: 14px;
+    width: 132px;
+    border-radius: 4px;
+    margin-bottom: 6px;
+}
+
 .artist-page > .artist-content > .section.skeleton-bottom > .media-item {
     display: flex;
     align-items: center;
