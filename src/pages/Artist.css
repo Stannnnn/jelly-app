@@ -228,7 +228,7 @@
 }
 
 .artist-page > .artist-content > .section.skeleton-bottom {
-    margin-bottom: 36px;
+    margin-bottom: 0;
 }
 
 .artist-page > .artist-content > .section.skeleton-bottom > .skeleton-title {

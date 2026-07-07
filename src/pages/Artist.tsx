@@ -186,15 +186,6 @@ export const Artist = () => {
                                 </div>
                             ))}
                         </div>
-                        <div className="section skeleton-bottom">
-                            <div className="skeleton-effect skeleton-title" />
-                            <div className="skeleton-effect skeleton-desc" />
-                            {Array.from({ length: 2 }).map((_, i) => (
-                                <div key={i} className="media-item album-item">
-                                    <Skeleton type="album" />
-                                </div>
-                            ))}
-                        </div>
                     </>
                 ) : (
                     <>
