@@ -32,7 +32,7 @@ export const Artist = () => {
         loading,
         statsLoading,
         error,
-    } = useJellyfinArtistData(artistId!)
+    } = useJellyfinArtistData(artistId!, 6)
     const {
         playlists,
         loading: playlistsLoading,
@@ -60,6 +60,7 @@ export const Artist = () => {
     }
 
     const topSongs = tracks.slice(0, 5)
+    const hasMoreTracks = tracks.length > 5
     const genres = artist.Genres || []
 
     const handleMoreClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -164,7 +165,7 @@ export const Artist = () => {
                             title={artist.Name}
                             hidden={{ view_artist: true, view_artists: true }}
                         />
-                        {(totalTrackCount || 0) > 5 && (
+                        {hasMoreTracks && (
                             <div className="all-tracks">
                                 <Link to={`/artist/${artistId}/tracks`} className="textlink">
                                     View all tracks
