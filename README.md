@@ -1,3 +1,35 @@
+
+<div align="right">
+  <details>
+    <summary >🌐 Language</summary>
+    <div>
+      <div align="center">
+        <a href="https://openaitx.github.io/view.html?user=Stannnnn&project=jelly-app&lang=en">English</a>
+        | <a href="https://openaitx.github.io/view.html?user=Stannnnn&project=jelly-app&lang=zh-CN">简体中文</a>
+        | <a href="https://openaitx.github.io/view.html?user=Stannnnn&project=jelly-app&lang=zh-TW">繁體中文</a>
+        | <a href="https://openaitx.github.io/view.html?user=Stannnnn&project=jelly-app&lang=ja">日本語</a>
+        | <a href="https://openaitx.github.io/view.html?user=Stannnnn&project=jelly-app&lang=ko">한국어</a>
+        | <a href="https://openaitx.github.io/view.html?user=Stannnnn&project=jelly-app&lang=hi">हिन्दी</a>
+        | <a href="https://openaitx.github.io/view.html?user=Stannnnn&project=jelly-app&lang=th">ไทย</a>
+        | <a href="https://openaitx.github.io/view.html?user=Stannnnn&project=jelly-app&lang=fr">Français</a>
+        | <a href="https://openaitx.github.io/view.html?user=Stannnnn&project=jelly-app&lang=de">Deutsch</a>
+        | <a href="https://openaitx.github.io/view.html?user=Stannnnn&project=jelly-app&lang=es">Español</a>
+        | <a href="https://openaitx.github.io/view.html?user=Stannnnn&project=jelly-app&lang=it">Italiano</a>
+        | <a href="https://openaitx.github.io/view.html?user=Stannnnn&project=jelly-app&lang=ru">Русский</a>
+        | <a href="https://openaitx.github.io/view.html?user=Stannnnn&project=jelly-app&lang=pt">Português</a>
+        | <a href="https://openaitx.github.io/view.html?user=Stannnnn&project=jelly-app&lang=nl">Nederlands</a>
+        | <a href="https://openaitx.github.io/view.html?user=Stannnnn&project=jelly-app&lang=pl">Polski</a>
+        | <a href="https://openaitx.github.io/view.html?user=Stannnnn&project=jelly-app&lang=ar">العربية</a>
+        | <a href="https://openaitx.github.io/view.html?user=Stannnnn&project=jelly-app&lang=fa">فارسی</a>
+        | <a href="https://openaitx.github.io/view.html?user=Stannnnn&project=jelly-app&lang=tr">Türkçe</a>
+        | <a href="https://openaitx.github.io/view.html?user=Stannnnn&project=jelly-app&lang=vi">Tiếng Việt</a>
+        | <a href="https://openaitx.github.io/view.html?user=Stannnnn&project=jelly-app&lang=id">Bahasa Indonesia</a>
+        | <a href="https://openaitx.github.io/view.html?user=Stannnnn&project=jelly-app&lang=as">অসমীয়া</
+      </div>
+    </div>
+  </details>
+</div>
+
 ## Jelly Music App (JMA)
 
 A lightweight & elegant music interface for Jellyfin. Made to be intuitive and minimal with great attention to detail, a clutter-free web app centered on music playback. Using the Jellyfin API, it provides seamless access to your personal music library. [Demo](https://stannnnn.github.io/jelly-app/login?demo=1)
