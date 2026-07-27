@@ -50,7 +50,15 @@ export const Downloads = () => {
                 items={items}
                 infiniteData={{ pageParams: [1], pages: [items] }}
                 isLoading={isLoading && queueItems.length === 0}
-                type={jellyItemKind === 'Audio' ? 'song' : jellyItemKind === 'MusicAlbum' ? 'album' : 'artist'}
+                type={
+                    jellyItemKind === 'Audio'
+                        ? 'song'
+                        : jellyItemKind === 'MusicAlbum'
+                          ? 'album'
+                          : jellyItemKind === 'Playlist'
+                            ? 'playlist'
+                            : 'artist'
+                }
                 loadMore={loadMore}
                 title={'Synced'}
                 disableActions={true}

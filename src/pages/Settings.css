@@ -217,6 +217,8 @@
 
 .settings-page > .section.quality > .container > .options > .option > .status {
     color: var(--brand-color);
+    position: relative;
+    z-index: 0;
     margin-top: 2px;
     margin-right: 10px;
     opacity: 0;
@@ -229,6 +231,18 @@
 .settings-page > .section.quality > .container > .options > .option.active > .status {
     opacity: 1;
     visibility: visible;
+}
+
+.settings-page > .section.quality > .container > .options > .option > .status:after {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 10px;
+    height: 10px;
+    background-color: #ffffff;
 }
 
 /* Switch */
@@ -556,7 +570,6 @@
 }
 
 .settings-page > .section.updates > .inner > .container > .subdesc > .icon.success {
-    margin-right: 6px;
     color: var(--success-color);
 }
 

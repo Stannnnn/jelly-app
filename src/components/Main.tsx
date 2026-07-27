@@ -135,6 +135,9 @@ export const MainContent = ({
                                         {filter.kind === 'Artists' && (
                                             <ArtistsIcon width="14" height="14" className="artist" />
                                         )}
+                                        {filter.kind === 'Playlists' && (
+                                            <PlaylistIcon width="14" height="14" className="playlist" />
+                                        )}
                                     </div>
                                     <select
                                         onChange={e => setFilter(c => ({ ...c, kind: e.target.value }))}
@@ -143,6 +146,7 @@ export const MainContent = ({
                                         <option value="Tracks">Tracks</option>
                                         <option value="Albums">Albums</option>
                                         <option value="Artists">Artists</option>
+                                        <option value="Playlists">Playlists</option>
                                     </select>
                                     <div className="icon">
                                         <ChevronDownIcon size={12} />
@@ -328,7 +332,7 @@ export const MainContent = ({
                                     </div>
                                 )}
                                 <div className="overlay">
-                                    <ExpandIcon width={14} height={14} className="icon" />
+                                    <ExpandIcon width={18} height={18} className="icon" />
                                 </div>
                             </Squircle>
                         </Link>

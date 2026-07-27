@@ -227,6 +227,32 @@
     margin-bottom: 6px;
 }
 
+.artist-page > .artist-content > .section.skeleton-bottom {
+    margin-bottom: 0;
+}
+
+.artist-page > .artist-content > .section.skeleton-bottom > .skeleton-title {
+    height: 18px;
+    width: 62px;
+    border-radius: 4px;
+    margin-bottom: 4px;
+}
+
+.artist-page > .artist-content > .section.skeleton-bottom > .skeleton-desc {
+    height: 14px;
+    width: 132px;
+    border-radius: 4px;
+    margin-bottom: 6px;
+}
+
+.artist-page > .artist-content > .section.skeleton-bottom > .media-item {
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    margin: 0 -8px;
+    border-radius: 8px;
+}
+
 .artist-page > .artist-content > .section.top-songs > .all-tracks {
     font-size: 0.725rem;
     font-weight: 500;

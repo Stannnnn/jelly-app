@@ -183,7 +183,7 @@ export const Sidenav = (props: { username: string }) => {
                                                 results
                                             </div>
                                         )}
-                                    {!searchLoading && !searchError && searchResults.length > 0 && (
+                                    {!searchError && searchResults.length > 0 && (
                                         <div className="results noSelect">
                                             {searchResults.map(item => {
                                                 const isActive =
@@ -283,7 +283,16 @@ export const Sidenav = (props: { username: string }) => {
                                                                 <div className="icon" title="Album">
                                                                     <AlbumIcon width={14} height={14} />
                                                                 </div>
-                                                                <div className="text">{item.Name}</div>
+                                                                <div className="text">
+                                                                    {item.Name}{' '}
+                                                                    <span className="artist">
+                                                                        (
+                                                                        {item.ArtistItems?.[0]?.Name ||
+                                                                            item.Artists?.[0] ||
+                                                                            'Unknown Artist'}
+                                                                        )
+                                                                    </span>
+                                                                </div>
                                                             </div>
                                                         )}
 

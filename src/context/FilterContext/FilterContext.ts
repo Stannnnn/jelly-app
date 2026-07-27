@@ -25,6 +25,7 @@ export enum KindState {
     Tracks = 'Tracks',
     Albums = 'Albums',
     Artists = 'Artists',
+    Playlists = 'Playlists',
     None = '',
 }
 

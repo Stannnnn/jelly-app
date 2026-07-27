@@ -17,7 +17,7 @@ export const useJellyfinArtistData = (artistId: string, trackLimit = 5) => {
     })
 
     // Fetch stats
-    const { data: statsData, error: statsError } = useQuery<
+    const { data: statsData, isFetching: statsFetching, isPending: statsPending, error: statsError } = useQuery<
         {
             albums: MediaItem[]
             appearsInAlbums: MediaItem[]
@@ -52,6 +52,7 @@ export const useJellyfinArtistData = (artistId: string, trackLimit = 5) => {
         totalPlays: statsData?.totalPlays || 0,
         totalAlbumCount: statsData?.totalAlbumCount || 0,
         loading: artistFetching || artistPending,
+        statsLoading: statsFetching || statsPending,
         error: artistError?.message || statsError?.message || null,
     }
 }

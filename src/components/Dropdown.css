@@ -241,7 +241,9 @@
         opacity: 1;
         visibility: visible;
         transform: scale(1) translateY(100%);
-        transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        transition:
+            height 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+            transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .dropdown.active {
@@ -261,6 +263,7 @@
         box-shadow: none;
         background-color: var(--bg-color-secondary);
         max-height: 70dvh;
+        height: 100%;
         overflow: auto;
         overflow-x: hidden;
         overscroll-behavior: contain;

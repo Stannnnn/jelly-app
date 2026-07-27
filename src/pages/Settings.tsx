@@ -29,7 +29,8 @@ export const Settings = ({ onLogout }: { onLogout: () => void }) => {
     const { storageStats, refreshStorageStats, queueCount, clearQueue } = useDownloadContext()
 
     const [clearing, setClearing] = useState(false)
-    const { latestRelease, updateStatus } = useUpdateChecker(playback.checkForUpdates)
+    const { latestRelease, updateStatus, isCheckingUpdate } = useUpdateChecker(playback.checkForUpdates)
+    const [forceChecking, setForceChecking] = useState(false)
 
     useEffect(() => {
         const fetchData = async () => {
@@ -96,6 +97,13 @@ export const Settings = ({ onLogout }: { onLogout: () => void }) => {
             setClearing(false)
         }
     }, [audioStorage, clearQueue, queryClient, refreshStorageStats])
+
+    const handleCheck = () => {
+        setForceChecking(true)
+        queryClient.invalidateQueries({ queryKey: ['appUpdate'] }).finally(() => {
+            setTimeout(() => setForceChecking(false), 1500)
+        })
+    }
 
     const reloadApp = async () => {
         queryClient.clear()
@@ -474,7 +482,7 @@ export const Settings = ({ onLogout }: { onLogout: () => void }) => {
                 </div>
                 {playback.checkForUpdates && updateStatus && (
                     <div className="inner row update-status">
-                        {updateStatus === 'checking' && (
+                        {isCheckingUpdate || forceChecking ? (
                             <div className="container">
                                 <div className="subdesc">
                                     <div className="icon checking">
@@ -483,18 +491,26 @@ export const Settings = ({ onLogout }: { onLogout: () => void }) => {
                                     <span className="text">Checking for updates...</span>
                                 </div>
                             </div>
-                        )}
-                        {updateStatus === 'current' && (
+                        ) : updateStatus === 'current' ? (
                             <div className="container">
                                 <div className="subdesc">
                                     <div className="icon success">
-                                        <CheckIcon size={16} />
+                                        <CheckIcon size={14} />
                                     </div>
-                                    <span className="text">You're up to date (v{__VERSION__})</span>
+                                    <span className="text">You're up to date (v{__VERSION__}) - </span>
+                                    <Link
+                                        to=""
+                                        onClick={e => {
+                                            e.preventDefault()
+                                            handleCheck()
+                                        }}
+                                        className="textlink"
+                                    >
+                                        Check now!
+                                    </Link>
                                 </div>
                             </div>
-                        )}
-                        {updateStatus === 'available' && latestRelease && (
+                        ) : updateStatus === 'available' && latestRelease ? (
                             <div className="container">
                                 <div className="subdesc">
                                     <div className="icon available">
@@ -513,8 +529,7 @@ export const Settings = ({ onLogout }: { onLogout: () => void }) => {
                                     </span>
                                 </div>
                             </div>
-                        )}
-                        {updateStatus === 'error' && (
+                        ) : updateStatus === 'error' ? (
                             <div className="container">
                                 <div className="subdesc">
                                     <div className="icon error">
@@ -523,7 +538,7 @@ export const Settings = ({ onLogout }: { onLogout: () => void }) => {
                                     <span className="text">Unable to check for updates</span>
                                 </div>
                             </div>
-                        )}
+                        ) : null}
                     </div>
                 )}
             </div>

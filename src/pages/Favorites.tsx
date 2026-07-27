@@ -1,13 +1,16 @@
 import { HeartFillIcon } from '@primer/octicons-react'
+import { useState } from 'react'
+import { InlineLoader } from '../components/InlineLoader'
 import { DownloadIndicators, MediaList } from '../components/MediaList'
 import { PlaylistTrackList } from '../components/PlaylistTrackList'
 import { Squircle } from '../components/Squircle'
-import { MoreIcon } from '../components/SvgIcons'
+import { MoreIcon, SearchClearIcon, SearchIcon } from '../components/SvgIcons'
 import { useDropdownContext } from '../context/DropdownContext/DropdownContext'
 import { useFilterContext } from '../context/FilterContext/FilterContext'
 import { usePlaybackContext } from '../context/PlaybackContext/PlaybackContext'
 import { useJellyfinFavoritesData } from '../hooks/Jellyfin/Infinite/useJellyfinFavoritesData'
 import { useJellyfinCustomContainerItem } from '../hooks/Jellyfin/useJellyfinCustomContainerItem'
+import { useJellyfinSearch } from '../hooks/Jellyfin/useJellyfinSearch'
 import { formatDurationReadable } from '../utils/formatDurationReadable'
 import './Favorites.css'
 
@@ -19,6 +22,19 @@ export const Favorites = () => {
     const { isOpen, onContextMenu } = useDropdownContext()
     const { customItem: favoritesCustomItem } = useJellyfinCustomContainerItem('favorites', 'Favorite Songs')
 
+    const [searchQuery, setSearchQuery] = useState('')
+    const { searchResults, searchLoading } = useJellyfinSearch(searchQuery)
+
+    const filteredTracks = searchQuery
+        ? searchResults.length > 0
+            ? searchResults.filter(item => item.Type === 'Audio' && item.UserData?.IsFavorite === true)
+            : items
+        : items
+
+    const handleClearSearch = () => {
+        setSearchQuery('')
+    }
+
     const handleMoreClick = (e: React.MouseEvent<HTMLDivElement>) => {
         e.stopPropagation()
 
@@ -27,7 +43,7 @@ export const Favorites = () => {
             return
         }
 
-        onContextMenu(e, { item: favoritesCustomItem, customContainer: 'favorites' }, true, {
+        onContextMenu(e, { item: favoritesCustomItem, opt: { customContainer: 'favorites' } }, true, {
             instant_mix: true,
             add_to_favorite: true,
             remove_from_favorite: true,
@@ -46,7 +62,7 @@ export const Favorites = () => {
                         </div>
                     </Squircle>
                     <div className="favorites-details">
-                        <div className="title">Favorite Songs</div>
+                        <div className="title">Favorite Tracks</div>
                         <div className="stats">
                             <div className="track-amount">
                                 <span className="number">{totalTrackCount}</span>{' '}
@@ -76,10 +92,11 @@ export const Favorites = () => {
                                 <div
                                     className="play-playlist"
                                     onClick={() => {
+                                        const tracksToPlay = searchQuery ? filteredTracks : items
                                         if (
                                             playback.setCurrentPlaylistSimple({
-                                                playlist: items,
-                                                title: 'Favorite Songs',
+                                                playlist: tracksToPlay,
+                                                title: 'Favorites',
                                             })
                                         ) {
                                             playback.playTrack(0)
@@ -91,11 +108,39 @@ export const Favorites = () => {
                                 </div>
                             </div>
                             <div className="secondary">
-                                <DownloadIndicators
-                                    offlineState={favoritesCustomItem?.offlineState}
-                                    size={12}
-                                    itemId={favoritesCustomItem?.Id}
-                                />
+                                <div className="input_container">
+                                    {!searchLoading && !searchQuery && (
+                                        <div className="search-icon noSelect">
+                                            <SearchIcon width={12} height={12} />
+                                        </div>
+                                    )}
+
+                                    {searchLoading && (
+                                        <div className="search-loading noSelect">
+                                            <InlineLoader />
+                                        </div>
+                                    )}
+
+                                    {!searchLoading && searchQuery && (
+                                        <div className="search-clear" onClick={handleClearSearch}>
+                                            <SearchClearIcon width={12} height={12} />
+                                        </div>
+                                    )}
+
+                                    <input
+                                        type="search"
+                                        placeholder="Filter tracks"
+                                        value={searchQuery}
+                                        onChange={e => setSearchQuery(e.target.value)}
+                                        //onChange={handleSearchChange}
+                                        //ref={searchInputRef}
+                                    />
+                                    <DownloadIndicators
+                                        offlineState={favoritesCustomItem?.offlineState}
+                                        size={12}
+                                        itemId={favoritesCustomItem?.Id}
+                                    />
+                                </div>
                                 <div
                                     className={`more ${isOpen ? 'active' : ''}`}
                                     onClick={handleMoreClick}
@@ -111,11 +156,11 @@ export const Favorites = () => {
 
             {jellyItemKind === 'Audio' && (
                 <PlaylistTrackList
-                    tracks={items}
-                    infiniteData={infiniteData}
-                    isLoading={isLoading}
+                    tracks={filteredTracks}
+                    infiniteData={searchQuery ? undefined : infiniteData}
+                    isLoading={searchQuery ? (searchLoading && searchResults.length === 0 && items.length === 0) : isLoading}
                     reviver={reviver}
-                    loadMore={loadMore}
+                    loadMore={searchQuery ? undefined : loadMore}
                     title={'Favorites'}
                 />
             )}
@@ -125,7 +170,9 @@ export const Favorites = () => {
                     items={items}
                     infiniteData={infiniteData}
                     isLoading={isLoading}
-                    type={jellyItemKind === 'MusicAlbum' ? 'album' : 'artist'}
+                    type={
+                        jellyItemKind === 'MusicAlbum' ? 'album' : jellyItemKind === 'Playlist' ? 'playlist' : 'artist'
+                    }
                     reviver={reviver}
                     loadMore={loadMore}
                     title={'Favorites'}

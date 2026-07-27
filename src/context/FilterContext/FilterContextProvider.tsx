@@ -135,6 +135,8 @@ const useInitialState = () => {
                 return BaseItemKind.MusicArtist
             case KindState.Albums:
                 return BaseItemKind.MusicAlbum
+            case KindState.Playlists:
+                return BaseItemKind.Playlist
             default:
                 return BaseItemKind.Audio
         }

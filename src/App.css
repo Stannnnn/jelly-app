@@ -187,7 +187,7 @@ html.light {
     --volume-dot-color-active: #a1a1a1;
     --scrollbar-color: #a8a8a8;
     --scrollbar-color-hover: #8a8a8a;
-    --dropdown-shadow: 0 0 4px rgba(0, 0, 0, 0.04);
+    --dropdown-shadow: 0 0 4px rgba(0, 0, 0, 0.06);
     --playing-artwork-opacity: 0.16;
     --playing-bg-color: rgba(0, 0, 0, 0.04);
     --playing-bg-color-secondary: rgba(0, 0, 0, 0.06);
@@ -230,13 +230,13 @@ html.dark {
     --volume-dot-color-active: #c4c1c7;
     --scrollbar-color: #78767c;
     --scrollbar-color-hover: #aba9af;
-    --dropdown-shadow: 0 0 4px rgba(0, 0, 0, 0.5);
+    --dropdown-shadow: 0 0 4px rgba(0, 0, 0, 0.6);
     --playing-artwork-opacity: 0.08;
     --playing-bg-color: rgba(255, 255, 255, 0.04);
     --playing-bg-color-secondary: rgba(255, 255, 255, 0.08);
     --playing-bg-color-tertiary: rgba(255, 255, 255, 0.16);
     --playing-bg-color-quaternary: rgba(255, 255, 255, 0.32);
-    --playing-border-color: rgba(255, 255, 255, 0.06);
+    --playing-border-color: rgba(255, 255, 255, 0.08);
     --playing-font-color: rgba(255, 255, 255, 0.4);
     --playing-font-color-active: rgba(255, 255, 255, 0.7);
 }
@@ -377,11 +377,12 @@ body.lockscroll {
 
 .login > .login_form > .input_container > input {
     font-size: 0.75rem;
+    text-overflow: ellipsis;
     width: 100%;
     padding: 8px 12px;
     border-radius: 8px;
+    background-color: var(--bg-color);
     outline: 1px solid var(--border-color);
-    text-overflow: ellipsis;
 }
 
 .login > .login_form > .submit_button {
@@ -487,6 +488,8 @@ body.lockscroll {
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
+    /* Help with CJK letter spacing */
+    line-height: 1.25rem;
 }
 
 .main > .main_header > .primary > .container > .page_title > .page-icon {
@@ -1186,7 +1189,8 @@ body.lockscroll {
 .genre-page > .empty,
 .playlist-page > .empty,
 .lyrics-page > .empty,
-.instant-mix-page > .empty {
+.instant-mix-page > .empty,
+.artist-tracks-page > .empty {
     font-size: 0.85rem;
     margin: 4px 0;
 }
@@ -1366,6 +1370,7 @@ body.lockscroll {
     }
 
     .main > .main_footer > .playback > .container > .controls > .knobs {
+        margin-top: 8px;
         margin-right: 6px;
     }
 

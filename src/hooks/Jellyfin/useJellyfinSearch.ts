@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
 import { MediaItem } from '../../api/jellyfin'
 import { useAudioStorageContext } from '../../context/AudioStorageContext/AudioStorageContext'
@@ -20,6 +20,7 @@ export const useJellyfinSearch = (searchQuery: string) => {
 
     const { data, isFetching, error } = useQuery<MediaItem[], Error>({
         queryKey: ['search', debouncedSearchQuery],
+        placeholderData: keepPreviousData,
         queryFn: async () => {
             if (!debouncedSearchQuery || !api.auth.serverUrl || !api.auth.token || !api.auth.userId) {
                 return []
@@ -54,7 +55,7 @@ export const useJellyfinSearch = (searchQuery: string) => {
 
     return {
         searchResults: data || [],
-        searchLoading: isFetching,
+        searchLoading: isFetching || debouncedSearchQuery !== searchQuery,
         searchError: error ? error.message : null,
         searchAttempted: searchQuery.length > 0,
     }
