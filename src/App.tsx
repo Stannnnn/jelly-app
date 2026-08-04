@@ -2,7 +2,7 @@ import '@fontsource-variable/inter'
 import { QueryClientProvider, useQueryClient } from '@tanstack/react-query'
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client'
 import { useCallback, useEffect, useState } from 'react'
-import { Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-dom'
+import { Navigate, Route, BrowserRouter as Router, Routes, useLocation, useSearchParams } from 'react-router-dom'
 import './App.css'
 import { Dropdown } from './components/Dropdown'
 import { ErrorBoundary } from './components/ErrorBoundary'
@@ -52,6 +52,26 @@ import { SearchTracks } from './pages/SearchTracks'
 import { Settings } from './pages/Settings'
 import { Tracks } from './pages/Tracks'
 import { persister, queryClient } from './queryClient'
+
+const isValidAppRedirect = (path: string): boolean => {
+    // must be relative and not redirect back to login
+    return path.startsWith('/') && !path.startsWith('//')
+        && !path.startsWith('/login')
+}
+
+const RedirectToLogin = () => {
+    const location = useLocation()
+    const redirect = location.pathname + location.search
+    if (redirect === '/') return <Navigate to="/login" />
+    return <Navigate to={`/login?redirect=${encodeURIComponent(redirect)}`} />
+}
+
+const NavigateAfterLogin = () => {
+    const [searchParams] = useSearchParams()
+    const redirect = searchParams.get('redirect')
+    const destination = redirect && isValidAppRedirect(redirect) ? redirect : '/'
+    return <Navigate to={destination} />
+}
 
 export const App = () => {
     return (
@@ -149,7 +169,7 @@ const RoutedApp = () => {
     const actualApp = (
         <div className="music-app">
             <Routes>
-                <Route path="/login" element={auth ? <Navigate to="/" /> : <Login onLogin={handleLogin} />} />
+                <Route path="/login" element={auth ? <NavigateAfterLogin /> : <Login onLogin={handleLogin} />} />
                 <Route
                     path="/*"
                     element={
@@ -169,7 +189,7 @@ const RoutedApp = () => {
                                 </AudioStorageContextProvider>
                             </JellyfinContextProvider>
                         ) : (
-                            <Navigate to="/login" />
+                            <RedirectToLogin />
                         )
                     }
                 />
