@@ -16,6 +16,7 @@
         "package:web": "bash ./scripts/web-release.sh",
         "package:desktop:linux": "bash ./scripts/desktop-linux-release.sh",
         "package:desktop:win": "powershell ./scripts/desktop-windows-release.ps1",
+        "build:desktop:win:arm64": "yarn tauri build -- --target aarch64-pc-windows-msvc",
         "package:desktop:macos": "bash ./scripts/desktop-macos-release.sh",
         "format": "prettier --write . --ignore-path .gitignore --ignore-path src-tauri/.gitignore"
     },
@@ -44,7 +45,7 @@
     },
     "devDependencies": {
         "@eslint/js": "^9.39.2",
-        "@tauri-apps/cli": "^2.9.6",
+        "@tauri-apps/cli": "^2.11.4",
         "@types/react": "^19.2.9",
         "@types/react-dom": "^19.2.3",
         "@types/react-router-dom": "^5.3.3",
