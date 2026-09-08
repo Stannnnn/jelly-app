@@ -1,5 +1,6 @@
 import { Jellyfin } from '@jellyfin/sdk'
 import {
+    GenresApi,
     InstantMixApi,
     LyricsApi,
     MediaInfoApi,
@@ -62,7 +63,7 @@ export const loginToJellyfin = async (serverUrl: string, username: string, passw
         const response = await fetch(`${serverUrl}/Users/AuthenticateByName`, {
             method: 'POST',
             headers: {
-                'X-Emby-Authorization': `MediaBrowser Client="Jelly Music App", Device="Web", DeviceId="${deviceId}", Version="${__VERSION__}"`,
+                Authorization: `MediaBrowser Client="Jelly Music App", Device="Web", DeviceId="${deviceId}", Version="${__VERSION__}"`,
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({ Username: username, Pw: password }),
@@ -1075,18 +1076,18 @@ export const initJellyfinApi = ({ serverUrl, userId, token }: { serverUrl: strin
 
     const getImageUrl = (item: MediaItem, type: 'Primary' | 'Backdrop', size: { width: number; height: number }) => {
         if (item.ImageTags?.[type]) {
-            return `${serverUrl}/Items/${item.Id}/Images/${type}?tag=${item.ImageTags[type]}&quality=100&fillWidth=${size.width}&fillHeight=${size.height}&format=webp&api_key=${token}`
+            return `${serverUrl}/Items/${item.Id}/Images/${type}?tag=${item.ImageTags[type]}&quality=100&fillWidth=${size.width}&fillHeight=${size.height}&format=webp&ApiKey=${token}`
         }
 
         if (item.AlbumId) {
-            return `${serverUrl}/Items/${item.AlbumId}/Images/${type}?quality=100&fillWidth=${size.width}&fillHeight=${size.height}&format=webp&api_key=${token}`
+            return `${serverUrl}/Items/${item.AlbumId}/Images/${type}?quality=100&fillWidth=${size.width}&fillHeight=${size.height}&format=webp&ApiKey=${token}`
         }
 
         return undefined
     }
 
     const getStreamUrl = (trackId: string, bitrate: number) => {
-        return `${serverUrl}/Audio/${trackId}/universal?UserId=${userId}&api_key=${token}&Container=opus,webm|opus,mp3,aac,m4a|aac,m4a|alac,m4b|aac,flac,webma,webm|webma,wav,ogg&TranscodingContainer=ts&TranscodingProtocol=hls&AudioCodec=aac&MaxStreamingBitrate=${
+        return `${serverUrl}/Audio/${trackId}/universal?UserId=${userId}&ApiKey=${token}&Container=opus,webm|opus,mp3,aac,m4a|aac,m4a|alac,m4b|aac,flac,webma,webm|webma,wav,ogg&TranscodingContainer=ts&TranscodingProtocol=hls&AudioCodec=aac&MaxStreamingBitrate=${
             bitrate || 140000000
         }&StartTimeTicks=0&EnableRedirection=true&EnableRemoteMedia=false`
     }
@@ -1191,9 +1192,8 @@ export const initJellyfinApi = ({ serverUrl, userId, token }: { serverUrl: strin
         const response = await fetch(`${serverUrl}/Items/${playlistId}`, {
             method: 'DELETE',
             headers: {
-                'X-Emby-Authorization': `MediaBrowser Client="Jelly Music App", Device="Web", DeviceId="${deviceId}", Version="${__VERSION__}"`,
+                Authorization: `MediaBrowser Client="Jelly Music App", Device="Web", DeviceId="${deviceId}", Version="${__VERSION__}", Token="${token}"`,
                 'Content-Type': 'application/json',
-                'X-Emby-Token': token,
             },
             signal: AbortSignal.timeout(20000),
         })
@@ -1232,13 +1232,13 @@ export const initJellyfinApi = ({ serverUrl, userId, token }: { serverUrl: strin
     }
 
     const getGenreByName = async (genreName: string) => {
-        const genresApi = new MusicGenresApi(api.configuration)
+        const genresApi = new GenresApi(api.configuration)
 
         try {
-            const response = await genresApi.getMusicGenre(
+            const response = await genresApi.getGenre(
                 {
-                    userId,
                     genreName,
+                    userId,
                 },
                 { signal: AbortSignal.timeout(20000) }
             )
