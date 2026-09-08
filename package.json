@@ -1,7 +1,7 @@
 {
     "name": "jelly-music-app",
     "private": true,
-    "version": "1.0.1",
+    "version": "1.0.2",
     "type": "module",
     "packageManager": "yarn@1.22.22",
     "scripts": {
@@ -17,7 +17,8 @@
         "package:desktop:linux": "bash ./scripts/desktop-linux-release.sh",
         "package:desktop:win": "powershell ./scripts/desktop-windows-release.ps1",
         "package:desktop:macos": "bash ./scripts/desktop-macos-release.sh",
-        "format": "prettier --write . --ignore-path .gitignore --ignore-path src-tauri/.gitignore"
+        "format": "prettier --write . --ignore-path .gitignore --ignore-path src-tauri/.gitignore",
+        "typecheck": "tsc --noEmit -p tsconfig.app.json"
     },
     "dependencies": {
         "@dnd-kit/core": "^6.3.1",

@@ -1295,6 +1295,8 @@ body.lockscroll {
 
     .dimmer.active ~ .main {
         filter: blur(16px);
+        user-select: none;
+        pointer-events: none;
     }
 }
 
