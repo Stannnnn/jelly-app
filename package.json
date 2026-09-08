@@ -15,7 +15,9 @@
         "build:desktop": "yarn tauri build",
         "package:web": "bash ./scripts/web-release.sh",
         "package:desktop:linux": "bash ./scripts/desktop-linux-release.sh",
+        "build:desktop:win:arm64": "yarn tauri build -- --target aarch64-pc-windows-msvc",
         "package:desktop:win": "powershell ./scripts/desktop-windows-release.ps1",
+        "package:desktop:win:arm64": "powershell ./scripts/desktop-windows-arm64-release.ps1",
         "package:desktop:macos": "bash ./scripts/desktop-macos-release.sh",
         "format": "prettier --write . --ignore-path .gitignore --ignore-path src-tauri/.gitignore",
         "typecheck": "tsc --noEmit -p tsconfig.app.json"
