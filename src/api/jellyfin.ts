@@ -1,6 +1,5 @@
 import { Jellyfin } from '@jellyfin/sdk'
 import {
-    GenresApi,
     InstantMixApi,
     LyricsApi,
     MediaInfoApi,
@@ -1232,10 +1231,10 @@ export const initJellyfinApi = ({ serverUrl, userId, token }: { serverUrl: strin
     }
 
     const getGenreByName = async (genreName: string) => {
-        const genresApi = new GenresApi(api.configuration)
+        const genresApi = new MusicGenresApi(api.configuration)
 
         try {
-            const response = await genresApi.getGenre(
+            const response = await genresApi.getMusicGenre(
                 {
                     genreName,
                     userId,
