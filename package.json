@@ -1,7 +1,7 @@
 {
     "name": "jelly-music-app",
     "private": true,
-    "version": "1.0.1",
+    "version": "1.0.2",
     "type": "module",
     "packageManager": "yarn@1.22.22",
     "scripts": {
