@@ -32,8 +32,9 @@
 }
 
 .genre-page > .genre-header > .thumbnail > .fallback-thumbnail > svg {
-    color: var(--brand-color);
-    opacity: 0.8;
+    fill: var(--font-color-tertiary);
+    opacity: 0.6;
+    margin-left: -4%;
 }
 
 .genre-page > .genre-header > .genre-details {

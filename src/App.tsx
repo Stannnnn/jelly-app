@@ -55,8 +55,7 @@ import { persister, queryClient } from './queryClient'
 
 const isValidAppRedirect = (path: string): boolean => {
     // must be relative and not redirect back to login
-    return path.startsWith('/') && !path.startsWith('//')
-        && !path.startsWith('/login')
+    return path.startsWith('/') && !path.startsWith('//') && !path.startsWith('/login')
 }
 
 const RedirectToLogin = () => {

@@ -1183,7 +1183,8 @@ const useInitialState = () => {
                                             ? 'artist'
                                             : context.item.Type === BaseItemKind.Playlist
                                               ? 'playlist'
-                                              : context.item.Type === BaseItemKind.MusicGenre
+                                              : context.item.Type === BaseItemKind.MusicGenre ||
+                                                  context.item.Type === BaseItemKind.Genre
                                                 ? 'genre'
                                                 : 'unknown'
                                 }`}
@@ -1234,6 +1235,7 @@ const useInitialState = () => {
                                     </div>
                                     {context.item.Type !== BaseItemKind.MusicArtist &&
                                         context.item.Type !== BaseItemKind.MusicGenre &&
+                                        context.item.Type !== BaseItemKind.Genre &&
                                         context.item.Id !== 'JMA_CUSTOM_FAVORITES' && (
                                             <div className="desc">
                                                 {context.item.Type === BaseItemKind.Audio

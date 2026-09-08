@@ -344,10 +344,14 @@
         height: 36px;
     }
 
+    .dropdown > .dropdown-menu > .dropdown-header > .container.genre > .thumbnail > .fallback-thumbnail {
+        width: 36px;
+        height: 36px;
+    }
+
     .dropdown > .dropdown-menu > .dropdown-header > .container > .thumbnail > .fallback-thumbnail > svg {
         fill: var(--font-color-tertiary);
         opacity: 0.6;
-        margin-left: -4%;
     }
 
     .dropdown > .dropdown-menu > .dropdown-header > .container > .thumbnail > .art {
