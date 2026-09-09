@@ -77,6 +77,33 @@ jobs:
                   GH_TOKEN: ${{ github.token }}
               run: gh release upload "${{ github.ref_name }}" release/* --clobber
 
+    build-and-upload-windows-arm64:
+        runs-on: windows-latest
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: lts/*
+
+            - name: Setup Rust
+              uses: dtolnay/rust-toolchain@stable
+
+            - name: Add Rust ARM64 target
+              run: rustup target add aarch64-pc-windows-msvc
+
+            - name: Build project
+              run: powershell.exe ./scripts/desktop-windows-arm64-release.ps1
+
+            - name: Upload Packaged Files
+              uses: jaywcjlove/github-action-upload-assets@main
+              with:
+                  tag: ${{ github.event.release.tag_name }}
+                  asset-path: '["release/*"]'
+
     build-and-upload-macos:
         runs-on: macos-latest
 
