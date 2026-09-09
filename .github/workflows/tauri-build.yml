@@ -87,7 +87,7 @@ jobs:
             - name: Setup Node.js
               uses: actions/setup-node@v4
               with:
-                  node-version: lts/*
+                  node-version: 24
 
             - name: Setup Rust
               uses: dtolnay/rust-toolchain@stable
@@ -99,10 +99,9 @@ jobs:
               run: powershell.exe ./scripts/desktop-windows-arm64-release.ps1
 
             - name: Upload Packaged Files
-              uses: jaywcjlove/github-action-upload-assets@main
-              with:
-                  tag: ${{ github.event.release.tag_name }}
-                  asset-path: '["release/*"]'
+              env:
+                  GH_TOKEN: ${{ github.token }}
+              run: gh release upload "${{ github.ref_name }}" release/* --clobber
 
     build-and-upload-macos:
         runs-on: macos-latest
