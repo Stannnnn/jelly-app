@@ -175,7 +175,10 @@ export const Artist = () => {
                     </div>
                 )}
 
-                {(statsLoading || playlistsLoading) && albums.length === 0 && playlists.length === 0 ? (
+                {(statsLoading || playlistsLoading) &&
+                albums.length === 0 &&
+                appearsInAlbums.length === 0 &&
+                playlists.length === 0 ? (
                     <>
                         <div className="section skeleton-bottom">
                             <div className="skeleton-effect skeleton-title" />
