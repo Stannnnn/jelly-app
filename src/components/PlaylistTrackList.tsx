@@ -48,13 +48,16 @@ export const PlaylistTrackList = ({
         (track: MediaItem, index: number) => {
             if (playback.currentTrack?.Id === track.Id) {
                 playback.togglePlayPause()
-            } else {
+            } else if (infiniteData?.pages?.length) {
+                // Prefer infinite/pages path and fallback to plain tracks, it's needed for filteredTracks which is used on ArtistTracks and Favorites
                 if (playback.setCurrentPlaylist({ pages: infiniteData, title, disableUrl, reviver })) {
                     playback.playTrack(index)
                 }
+            } else if (playback.setCurrentPlaylistSimple({ playlist: tracks, title, disableUrl })) {
+                playback.playTrack(index)
             }
         },
-        [playback, infiniteData, title, disableUrl, reviver]
+        [playback, infiniteData, tracks, title, disableUrl, reviver]
     )
 
     const renderTrack = (index: number, item: MediaItem | { isPlaceholder: true } | undefined) => {
