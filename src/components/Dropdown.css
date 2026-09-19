@@ -85,6 +85,8 @@
     position: relative;
     font-size: 0.75rem;
     font-weight: 500;
+    /* Help with CJK letter spacing - unitless to account for padding */
+    line-height: 1.25;
     cursor: pointer;
     padding: 4px 10px;
     border-radius: 4px;
@@ -441,6 +443,8 @@
 
     .dropdown > .dropdown-menu > .dropdown-item {
         font-size: 0.825rem;
+        /* Help with CJK letter spacing - account for padding */
+        line-height: 1rem;
         margin: 0 8px;
         padding: 10px 12px;
         border-radius: 8px;
