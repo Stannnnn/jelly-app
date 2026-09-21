@@ -28,6 +28,7 @@ export const useJellyfinSearchDetailed = (query: string | undefined) => {
 
     const { data, isFetching, error } = useQuery<SearchResults, Error>({
         queryKey: ['searchDetailed', query],
+        networkMode: 'always',
         queryFn: async () => {
             if (!query) {
                 return {
