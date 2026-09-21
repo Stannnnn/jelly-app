@@ -28,7 +28,7 @@
         "@dnd-kit/sortable": "^10.0.0",
         "@dnd-kit/utilities": "^3.2.2",
         "@fontsource-variable/inter": "^5.2.8",
-        "@jellyfin/sdk": "^0.13.0",
+        "@jellyfin/sdk": "^1.0.0",
         "@primer/octicons-react": "^19.21.2",
         "@tanstack/query-sync-storage-persister": "^5.90.22",
         "@tanstack/react-query": "^5.90.20",

@@ -1101,10 +1101,10 @@
     wrap-ansi "^8.1.0"
     wrap-ansi-cjs "npm:wrap-ansi@^7.0.0"
 
-"@jellyfin/sdk@^0.13.0":
-  version "0.13.0"
-  resolved "https://registry.yarnpkg.com/@jellyfin/sdk/-/sdk-0.13.0.tgz#8e5fe68fe6df22b287af2c65c5353cd1b7f2ced4"
-  integrity sha512-oiBAOXH6s+dKdReSsYgNktBDzbxtg4JVWhEzIxZSxKcWMdSKmBtK41MhXRO7IWAC40DguKUm3nU/Z493qPAlWA==
+"@jellyfin/sdk@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@jellyfin/sdk/-/sdk-1.0.0.tgz#cfd3a204f49a8f14f49ad00137c5a2918036c882"
+  integrity sha512-bu7EbMxEz+mH2N/v8Oj/dDCQQvTmEVTZBzKhYgwpKrL9l63LMZvjY2gvnU4imMi9389kzh0LQD75MzMtcoDJtA==
 
 "@jridgewell/gen-mapping@^0.3.12", "@jridgewell/gen-mapping@^0.3.5":
   version "0.3.13"
