@@ -16,7 +16,7 @@ import { CSS } from '@dnd-kit/utilities'
 import { HeartFillIcon } from '@primer/octicons-react'
 import { InfiniteData } from '@tanstack/react-query'
 import { ReactNode, useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { MediaItem } from '../api/jellyfin'
 import { useDownloadContext } from '../context/DownloadContext/DownloadContext'
 import { useDropdownContext } from '../context/DropdownContext/DropdownContext'
@@ -71,6 +71,7 @@ export const MediaList = ({
 }) => {
     const playback = usePlaybackContext()
     const navigate = useNavigate()
+    const location = useLocation()
     const { displayItems, setRowRefs } = useDisplayItems(items, isLoading)
 
     const hidden: IMenuItems = disableActions
@@ -211,8 +212,20 @@ export const MediaList = ({
                         ? {}
                         : {
                               onClick: () => navigate(`/album/${item.Id}`),
-                              onContextMenu: e => dropdown.onContextMenu(e, { item }, false, hidden),
-                              onTouchStart: e => dropdown.onTouchStart(e, { item }, false, hidden),
+                              onContextMenu: e =>
+                                  dropdown.onContextMenu(
+                                      e,
+                                      { item, sourceTitle: item.Name, sourceUrl: `/album/${item.Id}` },
+                                      false,
+                                      hidden
+                                  ),
+                              onTouchStart: e =>
+                                  dropdown.onTouchStart(
+                                      e,
+                                      { item, sourceTitle: item.Name, sourceUrl: `/album/${item.Id}` },
+                                      false,
+                                      hidden
+                                  ),
                               onTouchMove: dropdown.onTouchClear,
                               onTouchEnd: dropdown.onTouchClear,
                           })}
@@ -257,8 +270,20 @@ export const MediaList = ({
                         ? {}
                         : {
                               onClick: () => navigate(`/artist/${item.Id}`),
-                              onContextMenu: e => dropdown.onContextMenu(e, { item }, false, hidden),
-                              onTouchStart: e => dropdown.onTouchStart(e, { item }, false, hidden),
+                              onContextMenu: e =>
+                                  dropdown.onContextMenu(
+                                      e,
+                                      { item, sourceTitle: item.Name, sourceUrl: `/artist/${item.Id}` },
+                                      false,
+                                      hidden
+                                  ),
+                              onTouchStart: e =>
+                                  dropdown.onTouchStart(
+                                      e,
+                                      { item, sourceTitle: item.Name, sourceUrl: `/artist/${item.Id}` },
+                                      false,
+                                      hidden
+                                  ),
                               onTouchMove: dropdown.onTouchClear,
                               onTouchEnd: dropdown.onTouchClear,
                           })}
@@ -288,8 +313,20 @@ export const MediaList = ({
                         ? {}
                         : {
                               onClick: () => navigate(`/playlist/${item.Id}`),
-                              onContextMenu: e => dropdown.onContextMenu(e, { item }, false, hidden),
-                              onTouchStart: e => dropdown.onTouchStart(e, { item }, false, hidden),
+                              onContextMenu: e =>
+                                  dropdown.onContextMenu(
+                                      e,
+                                      { item, sourceTitle: item.Name, sourceUrl: `/playlist/${item.Id}` },
+                                      false,
+                                      hidden
+                                  ),
+                              onTouchStart: e =>
+                                  dropdown.onTouchStart(
+                                      e,
+                                      { item, sourceTitle: item.Name, sourceUrl: `/playlist/${item.Id}` },
+                                      false,
+                                      hidden
+                                  ),
                               onTouchMove: dropdown.onTouchClear,
                               onTouchEnd: dropdown.onTouchClear,
                           })}
@@ -325,8 +362,28 @@ export const MediaList = ({
                         ? {}
                         : {
                               onClick: () => navigate(`/genre/${encodeURIComponent(item.Name || '')}`),
-                              onContextMenu: e => dropdown.onContextMenu(e, { item }, false, hidden),
-                              onTouchStart: e => dropdown.onTouchStart(e, { item }, false, hidden),
+                              onContextMenu: e =>
+                                  dropdown.onContextMenu(
+                                      e,
+                                      {
+                                          item,
+                                          sourceTitle: item.Name,
+                                          sourceUrl: `/genre/${encodeURIComponent(item.Name || '')}`,
+                                      },
+                                      false,
+                                      hidden
+                                  ),
+                              onTouchStart: e =>
+                                  dropdown.onTouchStart(
+                                      e,
+                                      {
+                                          item,
+                                          sourceTitle: item.Name,
+                                          sourceUrl: `/genre/${encodeURIComponent(item.Name || '')}`,
+                                      },
+                                      false,
+                                      hidden
+                                  ),
                               onTouchMove: dropdown.onTouchClear,
                               onTouchEnd: dropdown.onTouchClear,
                           })}
@@ -356,8 +413,20 @@ export const MediaList = ({
                         ? {}
                         : {
                               onClick: () => handleSongClick(item, index),
-                              onContextMenu: e => dropdown.onContextMenu(e, { item }, false, hidden),
-                              onTouchStart: e => dropdown.onTouchStart(e, { item }, false, hidden),
+                              onContextMenu: e =>
+                                  dropdown.onContextMenu(
+                                      e,
+                                      { item, sourceTitle: title, sourceUrl: location.pathname },
+                                      false,
+                                      hidden
+                                  ),
+                              onTouchStart: e =>
+                                  dropdown.onTouchStart(
+                                      e,
+                                      { item, sourceTitle: title, sourceUrl: location.pathname },
+                                      false,
+                                      hidden
+                                  ),
                               onTouchMove: dropdown.onTouchClear,
                               onTouchEnd: dropdown.onTouchClear,
                           })}

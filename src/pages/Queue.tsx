@@ -7,8 +7,7 @@ import './Queue.css'
 
 export const Queue = () => {
     const { setPageTitle } = usePageTitle()
-    const { currentTrack, currentPlaylist, currentTrackIndex, playlistTitle, playlistUrl, isLoading, loadMore } =
-        usePlaybackContext()
+    const { currentTrack, currentPlaylist, currentTrackIndex, isLoading, loadMore } = usePlaybackContext()
 
     useEffect(() => {
         setPageTitle('Queue')
@@ -40,12 +39,12 @@ export const Queue = () => {
                     <div className="queue-desc">
                         <span className="text">
                             From{' '}
-                            {playlistUrl ? (
-                                <Link to={playlistUrl} className="textlink">
-                                    {playlistTitle}
+                            {currentTrack?.originUrl ? (
+                                <Link to={currentTrack.originUrl} className="textlink">
+                                    {currentTrack.originTitle}
                                 </Link>
                             ) : (
-                                <span className="highlight">{playlistTitle}</span>
+                                <span className="highlight">{currentTrack?.originTitle}</span>
                             )}
                         </span>
                     </div>

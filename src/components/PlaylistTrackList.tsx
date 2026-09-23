@@ -87,8 +87,12 @@ export const PlaylistTrackList = ({
                 onClick={() => handleTrackClick(track, index)}
                 key={track.Id}
                 ref={el => setRowRefs(index, el)}
-                onContextMenu={e => dropdown.onContextMenu(e, { item, playlistId })}
-                onTouchStart={e => dropdown.onTouchStart(e, { item, playlistId })}
+                onContextMenu={e =>
+                    dropdown.onContextMenu(e, { item, playlistId, sourceTitle: title, sourceUrl: location.pathname })
+                }
+                onTouchStart={e =>
+                    dropdown.onTouchStart(e, { item, playlistId, sourceTitle: title, sourceUrl: location.pathname })
+                }
                 onTouchMove={dropdown.onTouchClear}
                 onTouchEnd={dropdown.onTouchClear}
             >

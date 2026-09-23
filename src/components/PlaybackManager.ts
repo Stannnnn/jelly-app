@@ -219,14 +219,25 @@ export const usePlaybackManager = ({ initialVolume, clearOnLogout }: PlaybackMan
     }, [])
 
     // Mark items as manually added to queue
-    const markAsManuallyAdded = useCallback((items: MediaItem[]) => {
-        return items.map(item => ({ ...item, manuallyAdded: true }))
+    const markAsManuallyAdded = useCallback((items: MediaItem[], title = 'Queue', url?: string) => {
+        return items.map(item => ({
+            ...item,
+            manuallyAdded: true,
+            originTitle: title,
+            ...(url ? { originUrl: url } : {}),
+        }))
     }, [])
 
     const { items: _items, hasNextPage, loadMore, isLoading, infiniteData } = useJellyfinInfiniteData(reviverFn)
 
     const items = useMemo(() => {
-        const itemsWithIds = _items.map(addQueueId)
+        const itemsWithIds = _items
+            .map(addQueueId)
+            .map(item =>
+                item.originTitle
+                    ? item
+                    : { ...item, originTitle: playlistTitle, ...(playlistUrl ? { originUrl: playlistUrl } : {}) }
+            )
 
         if (isManualShuffle && itemsWithIds.length) {
             const playedEnd = currentTrackIndex.index + 1
@@ -237,7 +248,7 @@ export const usePlaybackManager = ({ initialVolume, clearOnLogout }: PlaybackMan
 
         return itemsWithIds
         // We ignore 'currentTrackIndex.index' here because we only want to shuffle once, not on every render.
-    }, [_items, addQueueId, isManualShuffle]) // eslint-disable-line react-hooks/exhaustive-deps
+    }, [_items, addQueueId, isManualShuffle, playlistTitle, playlistUrl]) // eslint-disable-line react-hooks/exhaustive-deps
 
     const _pages = useMemo(() => {
         return (
@@ -305,7 +316,18 @@ export const usePlaybackManager = ({ initialVolume, clearOnLogout }: PlaybackMan
 
                 const queryKey = ['reviver', ...(props.reviver?.queryKey || [])]
 
-                queryClient.setQueryData(queryKey, props.pages)
+                const url = location.href
+                const itemOriginUrl = url !== '/' && !props.disableUrl ? url : undefined
+
+                // Embed origin into every item so each queue entry carries its own source
+                const taggedPages: InfiniteData<MediaItem[], unknown> = {
+                    ...props.pages,
+                    pages: props.pages.pages.map(page =>
+                        page.map(item => ({ ...item, originTitle: props.title, originUrl: itemOriginUrl }))
+                    ),
+                }
+
+                queryClient.setQueryData(queryKey, taggedPages)
 
                 localStorage.setItem('reviver', JSON.stringify(props.reviver || {}))
                 setReviver(props.reviver || ({} as IReviver))
@@ -315,11 +337,9 @@ export const usePlaybackManager = ({ initialVolume, clearOnLogout }: PlaybackMan
                 localStorage.setItem('playlistTitle', props.title)
                 setPlaylistTitle(props.title)
 
-                const url = location.href
-
-                if (url !== '/' && !props.disableUrl) {
-                    localStorage.setItem('playlistUrl', url)
-                    setPlaylistUrl(url)
+                if (itemOriginUrl) {
+                    localStorage.setItem('playlistUrl', itemOriginUrl)
+                    setPlaylistUrl(itemOriginUrl)
                 } else {
                     localStorage.removeItem('playlistUrl')
                     setPlaylistUrl('')
@@ -1133,8 +1153,6 @@ export const usePlaybackManager = ({ initialVolume, clearOnLogout }: PlaybackMan
         loadMore,
         sessionPlayCount,
         resetSessionCount,
-        playlistTitle,
-        playlistUrl,
         audioRef,
         crossfadeRef,
         bitrate,

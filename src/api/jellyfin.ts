@@ -55,6 +55,8 @@ export type MediaItem = BaseItemDto & {
     queueId?: string
     manuallyAdded?: boolean
     downloadedImageUrl?: string
+    originTitle?: string
+    originUrl?: string
 }
 
 export type IJellyfinAuth = Parameters<typeof initJellyfinApi>[0]
