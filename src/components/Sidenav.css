@@ -702,6 +702,7 @@ html.winOS .sidenav > .sidenav_wrapper > .sidenav_footer {
     z-index: 2;
     padding: 12px;
     padding-top: 8px;
+    padding-bottom: 16px;
     margin-top: auto;
     background-color: var(--bg-color-secondary);
     box-shadow: 0 -6px 16px 10px var(--bg-color-secondary);
@@ -877,11 +878,15 @@ html.winOS .sidenav > .sidenav_wrapper > .sidenav_footer {
 /* Responsive */
 @media only screen and (pointer: coarse) {
     .sidenav > .sidenav_wrapper > .sidenav_footer {
-        padding-bottom: min(24px, env(safe-area-inset-bottom, 12px));
+        padding-bottom: max(20px, env(safe-area-inset-bottom, 0px));
     }
 
     html.safeAreaFallback .sidenav > .sidenav_wrapper > .sidenav_footer {
-        padding-bottom: 12px;
+        padding-bottom: 20px;
+    }
+
+    html.safeAreaFallbackAndroid .sidenav > .sidenav_wrapper > .sidenav_footer {
+        padding-bottom: 16px;
     }
 
     .sidenav > .sidenav_wrapper > .sidenav_footer > .account > .actions {
