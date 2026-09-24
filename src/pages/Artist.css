@@ -9,6 +9,11 @@
     margin-bottom: 14px;
 }
 
+.artist-page:not(:has(> .artist-content > .section.top-songs)) > .artist-header {
+    margin-left: 0;
+    margin-bottom: 40px;
+}
+
 .artist-page > .artist-header > .thumbnail {
     display: block;
     width: 100px;
