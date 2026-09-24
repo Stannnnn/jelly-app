@@ -20,7 +20,13 @@ import { DropdownItem } from './DropdownItem'
 export type IMenuItems = { [x in keyof IDropdownContext['menuItems']]?: boolean }
 export type IDropdownContext = ReturnType<typeof useInitialState>
 
-type IContext = { item: MediaItem; playlistId?: string; opt?: { customContainer?: string; limit?: number } }
+type IContext = {
+    item: MediaItem
+    playlistId?: string
+    sourceTitle?: string
+    sourceUrl?: string
+    opt?: { customContainer?: string; limit?: number }
+}
 
 const useInitialState = () => {
     const [isOpen, setIsOpen] = useState(false)
@@ -482,6 +488,8 @@ const useInitialState = () => {
             if (!context) return
 
             const insertionPoint = (playback.currentTrackIndex ?? -1) + 1
+            const sourceTitle = context.sourceTitle
+            const sourceUrl = context.sourceUrl
 
             await playback.updateCurrentPlaylist(async pages => {
                 let trackCounter = 0
@@ -492,7 +500,7 @@ const useInitialState = () => {
                     for (let trackIndex = 0; trackIndex < page.length; trackIndex++) {
                         if (trackCounter === insertionPoint) {
                             const expandedItems = await expandItems(item, context.opt)
-                            const markedItems = playback.markAsManuallyAdded(expandedItems)
+                            const markedItems = playback.markAsManuallyAdded(expandedItems, sourceTitle, sourceUrl)
 
                             return [
                                 ...pages.slice(0, pageIndex),
@@ -507,13 +515,13 @@ const useInitialState = () => {
 
                 if (insertionPoint >= trackCounter) {
                     const expandedItems = await expandItems(item, context.opt)
-                    const markedItems = playback.markAsManuallyAdded(expandedItems)
+                    const markedItems = playback.markAsManuallyAdded(expandedItems, sourceTitle, sourceUrl)
 
                     return [...pages.slice(0, pages.length - 1), [...pages[pages.length - 1], ...markedItems]]
                 }
 
                 const expandedItems = await expandItems(item, context.opt)
-                const markedItems = playback.markAsManuallyAdded(expandedItems)
+                const markedItems = playback.markAsManuallyAdded(expandedItems, sourceTitle, sourceUrl)
 
                 return [
                     [...(pages[0]?.slice(0, 1) || []), ...markedItems, ...(pages[0]?.slice(1) || [])],
@@ -535,7 +543,7 @@ const useInitialState = () => {
             if (!context) return
 
             const expandedItems = await expandItems(item, context.opt)
-            const markedItems = playback.markAsManuallyAdded(expandedItems)
+            const markedItems = playback.markAsManuallyAdded(expandedItems, context.sourceTitle, context.sourceUrl)
 
             await playback.updateCurrentPlaylist(async pages => [
                 ...pages.slice(0, pages.length - 1),

@@ -22,6 +22,7 @@ export const useIndexedDbDownloadsData = () => {
         initialPageParam: 0,
         staleTime: 0,
         retry: false,
+        networkMode: 'always',
     })
 
     const allItems = data ? data.pages.flat() : []

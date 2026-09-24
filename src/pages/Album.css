@@ -48,6 +48,8 @@
 .album-page > .album-header > .album-details > .artist {
     font-size: 0.9rem;
     font-weight: 600;
+    /* Help with CJK letter spacing */
+    line-height: 1.0625rem;
     margin-bottom: 4px;
 }
 

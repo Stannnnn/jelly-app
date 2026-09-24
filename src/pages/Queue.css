@@ -3,24 +3,20 @@
 }
 
 .queue-page > .queue-header {
-    margin-bottom: 20px;
+    margin-bottom: 26px;
+}
+
+.queue-page > .queue-header > .queue-desc {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--font-color-tertiary);
+    margin-top: 8px;
 }
 
 .queue-page > .queue-title {
     font-size: 0.95rem;
     font-weight: 700;
-    margin-bottom: 2px;
-}
-
-.queue-page > .queue-desc {
-    font-size: 0.75rem;
-    font-weight: 500;
-    color: var(--font-color-tertiary);
-    margin-bottom: 6px;
-}
-
-.queue-page > .queue-desc > .text > .highlight {
-    font-weight: 600;
+    margin-bottom: 4px;
 }
 
 /* dnd-kit related */

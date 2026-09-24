@@ -1,5 +1,6 @@
 import { HeartFillIcon } from '@primer/octicons-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { InlineLoader } from '../components/InlineLoader'
 import { DownloadIndicators, MediaList } from '../components/MediaList'
 import { PlaylistTrackList } from '../components/PlaylistTrackList'
@@ -22,13 +23,32 @@ export const Favorites = () => {
     const { isOpen, onContextMenu } = useDropdownContext()
     const { customItem: favoritesCustomItem } = useJellyfinCustomContainerItem('favorites', 'Favorite Songs')
 
-    const [searchQuery, setSearchQuery] = useState('')
+    const navigate = useNavigate()
+    const [searchQuery, setSearchQuery] = useState(new URLSearchParams(location.search).get('filter') || '')
     const { searchResults, searchLoading } = useJellyfinSearch(searchQuery)
 
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            const params = new URLSearchParams(location.search)
+            if (searchQuery) {
+                params.set('filter', searchQuery)
+            } else {
+                params.delete('filter')
+            }
+            const newSearch = params.toString()
+            const newUrl = newSearch ? `?${newSearch}` : location.pathname
+            const currentUrl = location.search || location.pathname
+            if (newUrl !== currentUrl) {
+                navigate(newUrl, { replace: true })
+            }
+        }, 200)
+        return () => clearTimeout(timer)
+    }, [searchQuery, navigate])
+
     const filteredTracks = searchQuery
-        ? searchResults.length > 0
-            ? searchResults.filter(item => item.Type === 'Audio' && item.UserData?.IsFavorite === true)
-            : items
+        ? searchLoading && searchResults.length === 0
+            ? items
+            : searchResults.filter(item => item.Type === 'Audio' && item.UserData?.IsFavorite === true)
         : items
 
     const handleClearSearch = () => {
@@ -158,7 +178,9 @@ export const Favorites = () => {
                 <PlaylistTrackList
                     tracks={filteredTracks}
                     infiniteData={searchQuery ? undefined : infiniteData}
-                    isLoading={searchQuery ? (searchLoading && searchResults.length === 0 && items.length === 0) : isLoading}
+                    isLoading={
+                        searchQuery ? searchLoading && searchResults.length === 0 && items.length === 0 : isLoading
+                    }
                     reviver={reviver}
                     loadMore={searchQuery ? undefined : loadMore}
                     title={'Favorites'}

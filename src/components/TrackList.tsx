@@ -1,4 +1,5 @@
 import { HeartFillIcon } from '@primer/octicons-react'
+import { useLocation } from 'react-router-dom'
 import { MediaItem } from '../api/jellyfin'
 import { useDropdownContext } from '../context/DropdownContext/DropdownContext'
 import { IMenuItems } from '../context/DropdownContext/DropdownContextProvider'
@@ -22,6 +23,7 @@ export const TrackList = ({
     hidden?: IMenuItems
 }) => {
     const playback = usePlaybackContext()
+    const location = useLocation()
 
     const MIN_PLAY_COUNT = 5
     const mostPlayedTracks = tracks
@@ -72,8 +74,22 @@ export const TrackList = ({
                                 }
                             }
                         }}
-                        onContextMenu={e => dropdown.onContextMenu(e, { item: track }, false, hidden)}
-                        onTouchStart={e => dropdown.onTouchStart(e, { item: track }, false, hidden)}
+                        onContextMenu={e =>
+                            dropdown.onContextMenu(
+                                e,
+                                { item: track, sourceTitle: title, sourceUrl: location.pathname },
+                                false,
+                                hidden
+                            )
+                        }
+                        onTouchStart={e =>
+                            dropdown.onTouchStart(
+                                e,
+                                { item: track, sourceTitle: title, sourceUrl: location.pathname },
+                                false,
+                                hidden
+                            )
+                        }
                         onTouchMove={dropdown.onTouchClear}
                         onTouchEnd={dropdown.onTouchClear}
                     >

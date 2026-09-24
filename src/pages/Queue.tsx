@@ -7,8 +7,7 @@ import './Queue.css'
 
 export const Queue = () => {
     const { setPageTitle } = usePageTitle()
-    const { currentTrack, currentPlaylist, currentTrackIndex, playlistTitle, playlistUrl, isLoading, loadMore } =
-        usePlaybackContext()
+    const { currentTrack, currentPlaylist, currentTrackIndex, isLoading, loadMore } = usePlaybackContext()
 
     useEffect(() => {
         setPageTitle('Queue')
@@ -32,23 +31,23 @@ export const Queue = () => {
                     title={'Current Track - Queue'}
                     hidden={{ add_to_queue: true, remove_from_queue: true }}
                 />
+                <div className="queue-desc">
+                    <span className="text">
+                        From{' '}
+                        {currentTrack?.originUrl ? (
+                            <Link to={currentTrack.originUrl} className="textlink">
+                                {currentTrack.originTitle}
+                            </Link>
+                        ) : (
+                            <span className="highlight">{currentTrack?.originTitle}</span>
+                        )}
+                    </span>
+                </div>
             </div>
 
             {(queueTracks.length > 0 || isLoading) && (
                 <>
-                    <div className="queue-title">Playing Next</div>
-                    <div className="queue-desc">
-                        <span className="text">
-                            From{' '}
-                            {playlistUrl ? (
-                                <Link to={playlistUrl} className="textlink">
-                                    {playlistTitle}
-                                </Link>
-                            ) : (
-                                <span className="highlight">{playlistTitle}</span>
-                            )}
-                        </span>
-                    </div>
+                    <div className="queue-title">Next in Queue</div>
                     <MediaList
                         items={queueTracks}
                         infiniteData={{ pageParams: [1], pages: [queueTracks] }}

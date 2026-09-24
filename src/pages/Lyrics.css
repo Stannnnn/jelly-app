@@ -22,6 +22,8 @@
 .lyrics-page.synced > .lyrics-line {
     font-size: 1.125rem;
     font-weight: 800;
+    /* Help with CJK letter spacing */
+    line-height: 1.3125rem;
     color: var(--font-color-tertiary);
     cursor: pointer;
     border-radius: 8px;

@@ -21,6 +21,7 @@ export const useJellyfinSearch = (searchQuery: string) => {
     const { data, isFetching, error } = useQuery<MediaItem[], Error>({
         queryKey: ['search', debouncedSearchQuery],
         placeholderData: keepPreviousData,
+        networkMode: 'always',
         queryFn: async () => {
             if (!debouncedSearchQuery || !api.auth.serverUrl || !api.auth.token || !api.auth.userId) {
                 return []

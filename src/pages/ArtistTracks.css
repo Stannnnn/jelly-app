@@ -44,6 +44,8 @@
 .artist-tracks-page > .artist-header > .artist-details > .title {
     font-size: 0.9rem;
     font-weight: 600;
+    /* Help with CJK letter spacing */
+    line-height: 1.0625rem;
     display: block;
     width: max-content;
     margin-bottom: 4px;

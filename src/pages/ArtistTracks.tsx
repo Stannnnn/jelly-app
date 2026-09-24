@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { JELLYFIN_MAX_LIMIT } from '../api/jellyfin'
 import { InlineLoader } from '../components/InlineLoader'
 import { JellyImg } from '../components/JellyImg'
@@ -31,18 +31,38 @@ export const ArtistTracks = () => {
     } = useJellyfinArtistTracksData(artistId!)
     const { setPageTitle } = usePageTitle()
     const { isOpen, selectedItem, onContextMenu } = useDropdownContext()
+    const navigate = useNavigate()
 
-    const [searchQuery, setSearchQuery] = useState('')
+    const [searchQuery, setSearchQuery] = useState(new URLSearchParams(location.search).get('filter') || '')
     const { searchResults, searchLoading } = useJellyfinSearch(searchQuery)
 
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            const params = new URLSearchParams(location.search)
+            if (searchQuery) {
+                params.set('filter', searchQuery)
+            } else {
+                params.delete('filter')
+            }
+            const newSearch = params.toString()
+            const newUrl = newSearch ? `?${newSearch}` : location.pathname
+            const currentUrl = location.search || location.pathname
+            if (newUrl !== currentUrl) {
+                navigate(newUrl, { replace: true })
+            }
+        }, 200)
+        return () => clearTimeout(timer)
+    }, [searchQuery, navigate])
+
     const filteredTracks = searchQuery
-        ? searchResults.length > 0
-            ? searchResults.filter(
+        ? searchLoading && searchResults.length === 0
+            ? allTracks
+            : searchResults.filter(
                   item =>
                       item.Type === 'Audio' &&
-                      (item.ArtistItems?.some(a => a.Id === artistId) || item.AlbumArtists?.some(a => a.Id === artistId))
+                      (item.ArtistItems?.some(a => a.Id === artistId) ||
+                          item.AlbumArtists?.some(a => a.Id === artistId))
               )
-            : allTracks
         : allTracks
 
     const handleClearSearch = () => {
@@ -177,7 +197,9 @@ export const ArtistTracks = () => {
             <PlaylistTrackList
                 tracks={filteredTracks}
                 infiniteData={searchQuery ? undefined : infiniteData}
-                isLoading={searchQuery ? (searchLoading && searchResults.length === 0 && allTracks.length === 0) : isLoading}
+                isLoading={
+                    searchQuery ? searchLoading && searchResults.length === 0 && allTracks.length === 0 : isLoading
+                }
                 showType="album"
                 title={artist ? `${artist.Name}'s Tracks` : 'Artist Tracks'}
                 reviver={reviver}
