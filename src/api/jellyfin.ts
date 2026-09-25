@@ -14,7 +14,7 @@ import { SystemApi } from '@jellyfin/sdk/lib/generated-client/api/system-api'
 import { UserApi } from '@jellyfin/sdk/lib/generated-client/api/user-api'
 import { UserDataApi } from '@jellyfin/sdk/lib/generated-client/api/user-data-api'
 import { UserViewApi } from '@jellyfin/sdk/lib/generated-client/api/user-view-api'
-import { BaseItemDto, BaseItemKind } from '@jellyfin/sdk/lib/generated-client/models'
+import { BaseItemDto, BaseItemKind, ItemFields } from '@jellyfin/sdk/lib/generated-client/models'
 import { CollectionType } from '@jellyfin/sdk/lib/generated-client/models/collection-type'
 import { ItemFilter } from '@jellyfin/sdk/lib/generated-client/models/item-filter'
 import { ItemSortBy } from '@jellyfin/sdk/lib/generated-client/models/item-sort-by'
@@ -547,6 +547,7 @@ export const initJellyfinApi = ({ serverUrl, userId, token }: { serverUrl: strin
                     sortBy: [ItemSortBy.PlayCount, ItemSortBy.SortName],
                     sortOrder: [SortOrder.Descending, SortOrder.Ascending],
                     limit: Math.min(trackLimit, JELLYFIN_MAX_LIMIT),
+                    fields: [ItemFields.Genres],
                 },
                 { signal: AbortSignal.timeout(20000) }
             ),
@@ -595,6 +596,7 @@ export const initJellyfinApi = ({ serverUrl, userId, token }: { serverUrl: strin
                         sortBy: [ItemSortBy.PremiereDate, ItemSortBy.ProductionYear, ItemSortBy.SortName],
                         sortOrder: [SortOrder.Descending],
                         limit: JELLYFIN_MAX_LIMIT,
+                        fields: [ItemFields.Genres],
                     },
                     { signal: AbortSignal.timeout(20000) }
                 ),
@@ -607,6 +609,7 @@ export const initJellyfinApi = ({ serverUrl, userId, token }: { serverUrl: strin
                         sortBy: [ItemSortBy.PremiereDate, ItemSortBy.ProductionYear, ItemSortBy.SortName],
                         sortOrder: [SortOrder.Descending],
                         limit: JELLYFIN_MAX_LIMIT,
+                        fields: [ItemFields.Genres],
                     },
                     { signal: AbortSignal.timeout(20000) }
                 ),
