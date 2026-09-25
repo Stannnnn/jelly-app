@@ -94,7 +94,10 @@ export const Artist = () => {
 
     const handleMoreClick = (e: React.MouseEvent<HTMLDivElement>) => {
         e.stopPropagation()
-        onContextMenu(e, { item: artist }, true, { add_to_favorite: true, remove_from_favorite: true })
+        onContextMenu(e, { item: artist, sourceTitle: artist.Name, sourceUrl: `/artist/${artist.Id}` }, true, {
+            add_to_favorite: true,
+            remove_from_favorite: true,
+        })
     }
 
     console.log('artist.Genres', artist.Genres)

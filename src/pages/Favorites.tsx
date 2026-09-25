@@ -20,7 +20,7 @@ export const Favorites = () => {
         useJellyfinFavoritesData()
     const { jellyItemKind } = useFilterContext()
     const playback = usePlaybackContext()
-    const { isOpen, onContextMenu } = useDropdownContext()
+    const { isOpen, selectedItem, onContextMenu } = useDropdownContext()
     const { customItem: favoritesCustomItem } = useJellyfinCustomContainerItem('favorites', 'Favorite Songs')
 
     const navigate = useNavigate()
@@ -63,11 +63,21 @@ export const Favorites = () => {
             return
         }
 
-        onContextMenu(e, { item: favoritesCustomItem, opt: { customContainer: 'favorites' } }, true, {
-            instant_mix: true,
-            add_to_favorite: true,
-            remove_from_favorite: true,
-        })
+        onContextMenu(
+            e,
+            {
+                item: favoritesCustomItem,
+                sourceTitle: favoritesCustomItem.Name || 'Favorite Songs',
+                sourceUrl: '/favorites',
+                opt: { customContainer: 'favorites' },
+            },
+            true,
+            {
+                instant_mix: true,
+                add_to_favorite: true,
+                remove_from_favorite: true,
+            }
+        )
     }
 
     return (
@@ -162,7 +172,7 @@ export const Favorites = () => {
                                     />
                                 </div>
                                 <div
-                                    className={`more ${isOpen ? 'active' : ''}`}
+                                    className={`more ${isOpen && selectedItem?.Id === favoritesCustomItem?.Id ? 'active' : ''}`}
                                     onClick={handleMoreClick}
                                     title="More"
                                 >

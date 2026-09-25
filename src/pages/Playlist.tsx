@@ -60,7 +60,12 @@ export const Playlist = () => {
 
     const handleMoreClick = (e: React.MouseEvent<HTMLDivElement>) => {
         e.stopPropagation()
-        onContextMenu(e, { item: playlistData }, true, { add_to_favorite: true, remove_from_favorite: true })
+        onContextMenu(
+            e,
+            { item: playlistData, sourceTitle: playlistData.Name, sourceUrl: `/playlist/${playlistId}` },
+            true,
+            { add_to_favorite: true, remove_from_favorite: true }
+        )
     }
 
     return (

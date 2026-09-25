@@ -67,7 +67,10 @@ export const Album = () => {
 
     const handleMoreClick = (e: React.MouseEvent<HTMLDivElement>) => {
         e.stopPropagation()
-        onContextMenu(e, { item: album }, true, { add_to_favorite: true, remove_from_favorite: true })
+        onContextMenu(e, { item: album, sourceTitle: album.Name, sourceUrl: `/album/${album.Id}` }, true, {
+            add_to_favorite: true,
+            remove_from_favorite: true,
+        })
     }
 
     return (

@@ -23,8 +23,8 @@ export type IDropdownContext = ReturnType<typeof useInitialState>
 type IContext = {
     item: MediaItem
     playlistId?: string
-    sourceTitle?: string
-    sourceUrl?: string
+    sourceTitle: string
+    sourceUrl: string
     opt?: { customContainer?: string; limit?: number }
 }
 
@@ -1058,6 +1058,7 @@ const useInitialState = () => {
                                 context?.item.Type === BaseItemKind.MusicAlbum ||
                                 context?.item.Type === BaseItemKind.MusicArtist ||
                                 context?.item.Type === BaseItemKind.MusicGenre ||
+                                context?.item.Type === BaseItemKind.Playlist ||
                                 context?.opt?.customContainer === 'favorites'),
                         node: menuItems.next,
                     },
@@ -1068,6 +1069,7 @@ const useInitialState = () => {
                                 context?.item.Type === BaseItemKind.MusicAlbum ||
                                 context?.item.Type === BaseItemKind.MusicArtist ||
                                 context?.item.Type === BaseItemKind.MusicGenre ||
+                                context?.item.Type === BaseItemKind.Playlist ||
                                 context?.opt?.customContainer === 'favorites'),
                         node: menuItems.add_to_queue,
                     },
@@ -1079,6 +1081,7 @@ const useInitialState = () => {
                                 context?.item.Type === BaseItemKind.MusicAlbum ||
                                 context?.item.Type === BaseItemKind.MusicArtist ||
                                 context?.item.Type === BaseItemKind.MusicGenre ||
+                                context?.item.Type === BaseItemKind.Playlist ||
                                 context?.opt?.customContainer === 'favorites'),
                         node: menuItems.remove_from_queue,
                     },

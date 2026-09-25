@@ -92,6 +92,8 @@ export const ArtistTracks = () => {
             e,
             {
                 item: artist!,
+                sourceTitle: artist!.Name,
+                sourceUrl: `/artist-tracks/${artistId}`,
                 opt: { limit: JELLYFIN_MAX_LIMIT },
             },
             true,
