@@ -878,11 +878,11 @@ html.winOS .sidenav > .sidenav_wrapper > .sidenav_footer {
 /* Responsive */
 @media only screen and (pointer: coarse) {
     .sidenav > .sidenav_wrapper > .sidenav_footer {
-        padding-bottom: max(20px, env(safe-area-inset-bottom, 0px));
+        padding-bottom: max(22px, env(safe-area-inset-bottom, 0px));
     }
 
     html.safeAreaFallback .sidenav > .sidenav_wrapper > .sidenav_footer {
-        padding-bottom: 20px;
+        padding-bottom: 22px;
     }
 
     html.safeAreaFallbackAndroid .sidenav > .sidenav_wrapper > .sidenav_footer {

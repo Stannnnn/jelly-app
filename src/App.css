@@ -1254,11 +1254,11 @@ body.lockscroll {
 
     .main > .main_footer > .playback > .container {
         max-height: 90px;
-        padding-bottom: max(20px, env(safe-area-inset-bottom, 0px));
+        padding-bottom: max(22px, env(safe-area-inset-bottom, 0px));
     }
 
     html.safeAreaFallback .main > .main_footer > .playback > .container {
-        padding-bottom: 20px;
+        padding-bottom: 22px;
     }
 
     html.safeAreaFallbackAndroid .main > .main_footer > .playback > .container {
