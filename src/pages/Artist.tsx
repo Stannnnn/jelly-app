@@ -61,12 +61,52 @@ export const Artist = () => {
 
     const topSongs = tracks.slice(0, 5)
     const hasMoreTracks = tracks.length > 5
-    const genres = artist.Genres || []
+
+    // Use artist genres when available, with fallback to top tracks or albums
+    const genres = (() => {
+        if (artist.Genres?.length) {
+            return artist.Genres
+        }
+
+        const genreSet = new Set<string>()
+
+        for (const track of tracks) {
+            track.Genres?.forEach(g => {
+                if (g?.trim()) genreSet.add(g.trim())
+            })
+        }
+
+        for (const album of albums) {
+            album.Genres?.forEach(g => {
+                if (g?.trim()) genreSet.add(g.trim())
+            })
+        }
+
+        for (const album of appearsInAlbums) {
+            album.Genres?.forEach(g => {
+                if (g?.trim()) genreSet.add(g.trim())
+            })
+        }
+
+        return Array.from(genreSet)
+    })()
+    const displayGenres = genres.slice(0, 6)
 
     const handleMoreClick = (e: React.MouseEvent<HTMLDivElement>) => {
         e.stopPropagation()
         onContextMenu(e, { item: artist }, true, { add_to_favorite: true, remove_from_favorite: true })
     }
+
+    console.log('artist.Genres', artist.Genres)
+    console.log(
+        'albums genres',
+        albums.map(a => ({ name: a.Name, Genres: a.Genres, GenreItems: a.GenreItems }))
+    )
+    console.log(
+        'appearsInAlbums genres',
+        appearsInAlbums.map(a => ({ name: a.Name, Genres: a.Genres, GenreItems: a.GenreItems }))
+    )
+    console.log('final genres', genres)
 
     return (
         <div className="artist-page">
@@ -78,10 +118,10 @@ export const Artist = () => {
                     <div className="artist">{artist.Name}</div>
                     {genres.length > 0 && (
                         <div className="genres">
-                            {genres.slice(0, 6).map((genre, index) => (
+                            {displayGenres.map((genre, index) => (
                                 <span key={genre}>
                                     <Link to={`/genre/${encodeURIComponent(genre)}`}>{genre}</Link>
-                                    {index < genres.slice(0, 6).length - 1 && ', '}
+                                    {index < displayGenres.length - 1 && ', '}
                                 </span>
                             ))}
                         </div>
