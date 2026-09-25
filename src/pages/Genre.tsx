@@ -47,10 +47,19 @@ export const Genre = () => {
     const handleMoreClick = (e: React.MouseEvent<HTMLDivElement>) => {
         e.stopPropagation()
 
-        onContextMenu(e, { item: currentGenre }, true, {
-            add_to_favorite: true,
-            remove_from_favorite: true,
-        })
+        onContextMenu(
+            e,
+            {
+                item: currentGenre,
+                sourceTitle: currentGenre.Name,
+                sourceUrl: `/genre/${encodeURIComponent(genre || '')}`,
+            },
+            true,
+            {
+                add_to_favorite: true,
+                remove_from_favorite: true,
+            }
+        )
     }
 
     return (

@@ -205,8 +205,20 @@ export const Sidenav = (props: { username: string }) => {
                                                         key={`${item.Type}-${item.Id}`}
                                                         onClick={() => handleSongClick(item)}
                                                         className={`result ${itemClass}`}
-                                                        onContextMenu={e => dropdown.onContextMenu(e, { item })}
-                                                        onTouchStart={e => dropdown.onTouchStart(e, { item })}
+                                                        onContextMenu={e =>
+                                                            dropdown.onContextMenu(e, {
+                                                                item,
+                                                                sourceTitle: item.Name,
+                                                                sourceUrl: item.AlbumId ? `/album/${item.AlbumId}` : '',
+                                                            })
+                                                        }
+                                                        onTouchStart={e =>
+                                                            dropdown.onTouchStart(e, {
+                                                                item,
+                                                                sourceTitle: item.Name,
+                                                                sourceUrl: item.AlbumId ? `/album/${item.AlbumId}` : '',
+                                                            })
+                                                        }
                                                         onTouchMove={dropdown.onTouchClear}
                                                         onTouchEnd={dropdown.onTouchClear}
                                                     >
@@ -264,8 +276,20 @@ export const Sidenav = (props: { username: string }) => {
                                                         }`}
                                                         onClick={closeSidenav}
                                                         className={`result ${itemClass}`}
-                                                        onContextMenu={e => dropdown.onContextMenu(e, { item: item })}
-                                                        onTouchStart={e => dropdown.onTouchStart(e, { item })}
+                                                        onContextMenu={e =>
+                                                            dropdown.onContextMenu(e, {
+                                                                item: item,
+                                                                sourceTitle: item.Name,
+                                                                sourceUrl: `/${item.Type === BaseItemKind.MusicArtist ? 'artist' : item.Type === BaseItemKind.MusicAlbum ? 'album' : item.Type === BaseItemKind.MusicGenre ? 'genre' : item.Type?.toLowerCase()}/${item.Type === BaseItemKind.MusicGenre ? encodeURIComponent(item.Name) : item.Id}`,
+                                                            })
+                                                        }
+                                                        onTouchStart={e =>
+                                                            dropdown.onTouchStart(e, {
+                                                                item,
+                                                                sourceTitle: item.Name,
+                                                                sourceUrl: `/${item.Type === BaseItemKind.MusicArtist ? 'artist' : item.Type === BaseItemKind.MusicAlbum ? 'album' : item.Type === BaseItemKind.MusicGenre ? 'genre' : item.Type?.toLowerCase()}/${item.Type === BaseItemKind.MusicGenre ? encodeURIComponent(item.Name) : item.Id}`,
+                                                            })
+                                                        }
                                                         onTouchMove={dropdown.onTouchClear}
                                                         onTouchEnd={dropdown.onTouchClear}
                                                     >

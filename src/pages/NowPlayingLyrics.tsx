@@ -28,7 +28,16 @@ export const NowPlayingLyrics = () => {
         }
 
         e.stopPropagation()
-        onContextMenu(e, { item: currentTrack }, true, { add_to_favorite: true, remove_from_favorite: true })
+        onContextMenu(
+            e,
+            {
+                item: currentTrack,
+                sourceTitle: currentTrack.originTitle || currentTrack.Name,
+                sourceUrl: currentTrack.originUrl ?? '',
+            },
+            true,
+            { add_to_favorite: true, remove_from_favorite: true }
+        )
     }
 
     return (
