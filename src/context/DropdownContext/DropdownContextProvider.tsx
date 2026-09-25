@@ -105,17 +105,13 @@ const useInitialState = () => {
     }, [])
 
     useEffect(() => {
-        let timeoutId: NodeJS.Timeout
+        if (isOpen) return
 
-        if (!isOpen) {
-            timeoutId = setTimeout(() => {
-                setPosition({ x: 0, y: 0 })
-            }, 200)
-        }
+        const timeoutId = setTimeout(() => {
+            setPosition({ x: 0, y: 0 })
+        }, 200)
 
-        return () => {
-            clearTimeout(timeoutId)
-        }
+        return () => clearTimeout(timeoutId)
     }, [isOpen])
 
     // Block interactions for 400ms after dropdown opens on touch devices to prevent accidental taps
