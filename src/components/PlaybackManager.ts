@@ -185,6 +185,24 @@ export const usePlaybackManager = ({ initialVolume, clearOnLogout }: PlaybackMan
                 } catch (e) {
                     console.error('Error in reviver queryFn:', e)
                     console.trace()
+
+                    try {
+                        localStorage.setItem(
+                            'reviverBackup',
+                            JSON.stringify({
+                                time: new Date().toISOString(),
+                                reviver,
+                                error: {
+                                    message: e instanceof Error ? e.message : String(e),
+                                    stack: e instanceof Error ? e.stack : undefined,
+                                    trace: new Error().stack,
+                                },
+                            })
+                        )
+                    } catch (storageError) {
+                        console.error('Failed to store reviver backup:', storageError)
+                    }
+
                     return []
                 }
             },
