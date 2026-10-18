@@ -19,16 +19,15 @@ pub fn run() {
       // The window-state plugin will restore position/size for subsequent runs
       let window = app.get_webview_window("main").unwrap();
 
-      // The webview keeps rendering when minimized, so flag it for CSS (see .app-hidden)
+      // WebView2 isn't told about minimize, so mark it hidden to suspend rendering like a browser tab
       let was_minimized = AtomicBool::new(false);
       let w = window.clone();
       window.on_window_event(move |event| {
         if let WindowEvent::Resized(_) = event {
           let minimized = w.is_minimized().unwrap_or(false);
           if was_minimized.swap(minimized, Ordering::Relaxed) != minimized {
-            let _ = w.eval(format!(
-              "document.documentElement.classList.toggle('app-hidden', {minimized})"
-            ));
+            let webview: &tauri::Webview = w.as_ref();
+            let _ = if minimized { webview.hide() } else { webview.show() };
           }
         }
       });
