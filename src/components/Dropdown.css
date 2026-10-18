@@ -290,6 +290,10 @@
         padding-bottom: 8px;
     }
 
+    html.safeAreaFallbackAndroid .dropdown > .dropdown-menu {
+        padding-bottom: 8px;
+    }
+
     .dropdown > .dropdown-menu > .dropdown-header {
         display: flex;
         align-items: center;
