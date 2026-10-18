@@ -11,6 +11,14 @@
     box-sizing: border-box;
 }
 
+/* Set by the Tauri backend while minimized: nothing animates or repaints */
+.app-hidden *,
+.app-hidden *::before,
+.app-hidden *::after {
+    animation-play-state: paused !important;
+    transition: none !important;
+}
+
 a {
     color: inherit;
     text-decoration: none;

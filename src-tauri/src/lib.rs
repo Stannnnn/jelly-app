@@ -1,4 +1,5 @@
-use tauri::Manager;
+use std::sync::atomic::{AtomicBool, Ordering};
+use tauri::{Manager, WindowEvent};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -17,6 +18,20 @@ pub fn run() {
       // Setup initial responsive window sizing (only on first run)
       // The window-state plugin will restore position/size for subsequent runs
       let window = app.get_webview_window("main").unwrap();
+
+      // The webview keeps rendering when minimized, so flag it for CSS (see .app-hidden)
+      let was_minimized = AtomicBool::new(false);
+      let w = window.clone();
+      window.on_window_event(move |event| {
+        if let WindowEvent::Resized(_) = event {
+          let minimized = w.is_minimized().unwrap_or(false);
+          if was_minimized.swap(minimized, Ordering::Relaxed) != minimized {
+            let _ = w.eval(format!(
+              "document.documentElement.classList.toggle('app-hidden', {minimized})"
+            ));
+          }
+        }
+      });
       
       // Check if this is likely the first run by comparing current size to config defaults
       // If window-state plugin restored the window, the size will likely differ from config
