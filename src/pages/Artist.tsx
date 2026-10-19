@@ -62,7 +62,7 @@ export const Artist = () => {
     const topSongs = tracks.slice(0, 5)
     const hasMoreTracks = tracks.length > 5
 
-    // Use artist genres when available, with fallback to top tracks or albums
+    // Use artist genres when available, with fallback to top tracks and then albums
     const genres = (() => {
         if (artist.Genres?.length) {
             return artist.Genres
@@ -74,6 +74,10 @@ export const Artist = () => {
             track.Genres?.forEach(g => {
                 if (g?.trim()) genreSet.add(g.trim())
             })
+        }
+
+        if (genreSet.size > 0) {
+            return Array.from(genreSet)
         }
 
         for (const album of albums) {
