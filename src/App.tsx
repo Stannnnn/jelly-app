@@ -107,7 +107,7 @@ const RoutedApp = () => {
         setAuth(null)
         localStorage.removeItem('auth')
         setIsLoggingOut(false)
-        queryClient.clear()
+        await queryClient.resetQueries()
         await persister.removeClient()
     }
 
