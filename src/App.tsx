@@ -80,7 +80,7 @@ export const App = () => {
                     <RoutedApp />
                 </QueryClientProvider>
             ) : (
-                <PersistQueryClientProvider client={queryClient} persistOptions={{ persister }}>
+                <PersistQueryClientProvider client={queryClient} persistOptions={{ persister, maxAge: Infinity }}>
                     <RoutedApp />
                 </PersistQueryClientProvider>
             )}
