@@ -94,7 +94,7 @@ export const Artist = () => {
 
         return Array.from(genreSet)
     })()
-    const displayGenres = genres.slice(0, 6)
+    const displayGenres = genres.slice(0, 5)
 
     const handleMoreClick = (e: React.MouseEvent<HTMLDivElement>) => {
         e.stopPropagation()
